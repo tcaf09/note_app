@@ -7,12 +7,7 @@ function ContextMenu({ pos }: { pos: Pos }) {
   return (
     <div
       className="absolute bg-stone-900"
-      style={{
-        left: pos.x,
-        top: pos.y,
-        width: 150,
-        height: 60
-      }}
+      style={{top: pos.y, left: pos.x}}
     ></div>
   );
 }

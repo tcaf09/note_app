@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import DOMPurify from "dompurify";
 import Tiptap from "./Tiptap";
 
 type Position = [number, number];
@@ -14,13 +13,11 @@ type Box = {
 function Textbox({ props }: { props: Box }) {
   const [box, setBox] = useState<Box>(props);
   const [selected, setSelected] = useState<boolean>(true);
-  const [content, setContent] = useState<string>("");
 
   const isDraging = useRef(false);
   const offset = useRef<Position>([0, 0]);
   const boxRef = useRef<HTMLDivElement>(null);
   const resizeHandle = useRef<null | string>(null);
-  const editorRef = useRef<HTMLDivElement>(null);
 
   const startDrag = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -109,17 +106,6 @@ function Textbox({ props }: { props: Box }) {
     });
   };
 
-  const handleTyping = () => {
-    if (editorRef.current) {
-      const dirty = editorRef.current.innerHTML;
-      const clean = DOMPurify.sanitize(dirty);
-      setContent(clean);
-
-      editorRef.current.style.height = "auto";
-      editorRef.current.style.height = editorRef.current.scrollHeight + "px";
-    }
-  };
-
   useEffect(() => {
     const deselect = (e: MouseEvent) => {
       if (boxRef.current && !boxRef.current.contains(e.target as Node)) {
@@ -180,7 +166,7 @@ function Textbox({ props }: { props: Box }) {
         className="absolute w-2 h-2 -bottom-1 -right-1 hover:cursor-nwse-resize"
         onMouseDown={(e) => startResize("bottomRight", e)}
       ></div>
-      <Tiptap selected={selected}/>
+      <Tiptap selected={selected} size={{width: 100, height:100 }}/>
     </div>
   );
 }

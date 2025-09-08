@@ -9,9 +9,15 @@ type Box = {
   height: number;
 };
 
+type Pos = {
+  x: number;
+  y: number;
+};
+
 function Note() {
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [textboxes, setTextboxes] = useState<Box[]>([]);
+  const [contextPos, setContextPos] = useState<Pos | null>(null);
 
   const addTextbox = (e: React.MouseEvent) => {
     const posx = e.clientX - 50;
@@ -25,6 +31,11 @@ function Note() {
     setSelectedOption("mouse");
   };
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setContextPos({ x: e.clientX, y: e.clientY})
+  }
+
   return (
     <>
       <div
@@ -37,7 +48,7 @@ function Note() {
         }}
       >
         {textboxes.map((box, i) => (
-          <Textbox key={i} props={box} />
+          <Textbox key={i} props={box}/>
         ))}
       </div>
       <Toolbar selected={selectedOption} setSelected={setSelectedOption} />

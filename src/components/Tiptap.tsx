@@ -6,13 +6,19 @@ import StarterKit from "@tiptap/starter-kit";
 import { FaBold, FaUnderline, FaItalic } from "react-icons/fa";
 import { useEffect } from "react";
 
-const Tiptap = ({ selected }: { selected: boolean }) => {
+type Size = {
+  width: 100;
+  height: 100;
+};
+
+const Tiptap = ({ selected, size }: { selected: boolean; size: Size }) => {
   const editor = useEditor({
     editable: selected,
     extensions: [StarterKit], // define your extension array
     editorProps: {
       attributes: {
         class: `${selected ? "pointer-events-auto select-text" : "pointer-events-none select-none"} text-white break-words focus:outline-none`,
+        style: `min-height: ${size.height}px;`,
       },
     },
   });
@@ -31,22 +37,20 @@ const Tiptap = ({ selected }: { selected: boolean }) => {
         <div className="bubble-menu flex p-3 bg-stone-900 rounded-full">
           <button
             onClick={() => editor.chain().focus().toggleBold().run()}
-            className={`px-2 py-1  text-xs rounded text-white ${
-              editor.isActive("bold")
+            className={`px-2 py-1  text-xs rounded text-white ${editor.isActive("bold")
                 ? "bg-purple-500 hover:bg-purple-600 "
                 : "hover:bg-white text-black"
-            }`}
+              }`}
             type="button"
           >
             <FaBold />
           </button>
           <button
             onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={`px-2 py-1 text-xs rounded text-white ${
-              editor.isActive("italic")
+            className={`px-2 py-1 text-xs rounded text-white ${editor.isActive("italic")
                 ? "bg-purple-500 hover:bg-purple-600 "
                 : "hover:bg-white text-black"
-            }`}
+              }`}
             type="button"
           >
             <FaItalic />
@@ -54,11 +58,10 @@ const Tiptap = ({ selected }: { selected: boolean }) => {
 
           <button
             onClick={() => editor.chain().focus().toggleUnderline().run()}
-            className={`px-2 py-1 text-xs rounded text-white ${
-              editor.isActive("italic")
+            className={`px-2 py-1 text-xs rounded text-white ${editor.isActive("italic")
                 ? "bg-purple-500 hover:bg-purple-600 "
-                : "hover:bg-white text-black" 
-            }`}
+                : "hover:bg-white text-black"
+              }`}
             type="button"
           >
             <FaUnderline />
