@@ -10,7 +10,13 @@ type Box = {
   height: number;
 };
 
-function Textbox({ props }: { props: Box }) {
+type TextboxProps = {
+  props: Box;
+  handleContextMenu: (e: React.MouseEvent) => void;
+};
+
+
+function Textbox({ props, handleContextMenu }: TextboxProps) {
   const [box, setBox] = useState<Box>(props);
   const [selected, setSelected] = useState<boolean>(true);
 
@@ -166,7 +172,7 @@ function Textbox({ props }: { props: Box }) {
         className="absolute w-2 h-2 -bottom-1 -right-1 hover:cursor-nwse-resize"
         onMouseDown={(e) => startResize("bottomRight", e)}
       ></div>
-      <Tiptap selected={selected} size={{width: 100, height:100 }}/>
+      <Tiptap selected={selected} size={{width: 100, height:100 }} onContextMenu={handleContextMenu}/>
     </div>
   );
 }

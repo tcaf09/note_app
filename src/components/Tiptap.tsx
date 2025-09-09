@@ -11,7 +11,15 @@ type Size = {
   height: 100;
 };
 
-const Tiptap = ({ selected, size }: { selected: boolean; size: Size }) => {
+const Tiptap = ({
+  selected,
+  size,
+  onContextMenu,
+}: {
+  selected: boolean;
+  size: Size;
+  onContextMenu?: (e: React.MouseEvent) => void;
+}) => {
   const editor = useEditor({
     editable: selected,
     extensions: [StarterKit], // define your extension array
@@ -37,20 +45,14 @@ const Tiptap = ({ selected, size }: { selected: boolean; size: Size }) => {
         <div className="bubble-menu flex p-3 bg-stone-900 rounded-full">
           <button
             onClick={() => editor.chain().focus().toggleBold().run()}
-            className={`px-2 py-1  text-xs rounded text-white ${editor.isActive("bold")
-                ? "bg-purple-500 hover:bg-purple-600 "
-                : "hover:bg-white text-black"
-              }`}
+            className="px-2 py-1 text-xs rounded text-white hover:bg-white hover:text-black"
             type="button"
           >
             <FaBold />
           </button>
           <button
             onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={`px-2 py-1 text-xs rounded text-white ${editor.isActive("italic")
-                ? "bg-purple-500 hover:bg-purple-600 "
-                : "hover:bg-white text-black"
-              }`}
+            className="px-2 py-1 text-xs rounded text-white hover:bg-white hover:text-black"
             type="button"
           >
             <FaItalic />
@@ -58,10 +60,7 @@ const Tiptap = ({ selected, size }: { selected: boolean; size: Size }) => {
 
           <button
             onClick={() => editor.chain().focus().toggleUnderline().run()}
-            className={`px-2 py-1 text-xs rounded text-white ${editor.isActive("italic")
-                ? "bg-purple-500 hover:bg-purple-600 "
-                : "hover:bg-white text-black"
-              }`}
+            className="px-2 py-1 text-xs rounded text-white hover:bg-white hover:text-black"
             type="button"
           >
             <FaUnderline />
@@ -69,7 +68,7 @@ const Tiptap = ({ selected, size }: { selected: boolean; size: Size }) => {
         </div>
       </BubbleMenu>
 
-      <EditorContent editor={editor} />
+      <EditorContent editor={editor} onContextMenu={onContextMenu}/>
     </>
   );
 };
