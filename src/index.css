@@ -4,9 +4,17 @@
 @tailwind components;
 @tailwind utilities;
 
-
-body {
-  @apply bg-stone-800;
+@layer base {
+  body {
+    @apply bg-stone-800;
+  }
+  h1 {
+    @apply text-4xl font-bold mt-4 mb-2;
+  }
+  h2 {
+    @apply text-3xl font-semibold mt-3 mb-2;
+  }
+  h3 {
+    @apply text-2xl font-semibold mt-2 mb-1;
+  }
 }
-
-

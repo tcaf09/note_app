@@ -172,7 +172,7 @@ function Textbox({ props, handleContextMenu }: TextboxProps) {
         className="absolute w-2 h-2 -bottom-1 -right-1 hover:cursor-nwse-resize"
         onMouseDown={(e) => startResize("bottomRight", e)}
       ></div>
-      <Tiptap selected={selected} size={{width: 100, height:100 }} onContextMenu={handleContextMenu}/>
+      <Tiptap selected={selected} onContextMenu={handleContextMenu}/>
     </div>
   );
 }
