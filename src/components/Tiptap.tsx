@@ -5,6 +5,9 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { FaBold, FaUnderline, FaItalic } from "react-icons/fa";
 import { useEffect } from "react";
+import { HeadingDropdownMenu } from "./tiptap-ui/heading-dropdown-menu";
+import Heading from "@tiptap/extension-heading";
+
 
 type Size = {
   width: 100;
@@ -22,10 +25,14 @@ const Tiptap = ({
 }) => {
   const editor = useEditor({
     editable: selected,
-    extensions: [StarterKit], // define your extension array
+    extensions: [StarterKit.configure({
+      heading: false,
+    }), Heading.configure({
+        levels: [1, 2, 3]
+      })], // define your extension array
     editorProps: {
       attributes: {
-        class: `${selected ? "pointer-events-auto select-text" : "pointer-events-none select-none"} text-white break-words focus:outline-none`,
+        class: `text-white ${selected ? "pointer-events-auto select-text" : "pointer-events-none select-none"} break-words focus:outline-none`,
         style: `min-height: ${size.height}px;`,
       },
     },
@@ -42,6 +49,12 @@ const Tiptap = ({
   return (
     <>
       <BubbleMenu editor={editor} options={{ placement: "bottom", offset: 8 }}>
+        <HeadingDropdownMenu
+          editor={editor}
+          levels={[1, 2, 3]}
+          hideWhenUnavailable={true}
+          portal={false}
+        />
         <div className="bubble-menu flex p-3 bg-stone-900 rounded-full">
           <button
             onClick={() => editor.chain().focus().toggleBold().run()}
@@ -68,7 +81,7 @@ const Tiptap = ({
         </div>
       </BubbleMenu>
 
-      <EditorContent editor={editor} onContextMenu={onContextMenu}/>
+      <EditorContent editor={editor} onContextMenu={onContextMenu} />
     </>
   );
 };
