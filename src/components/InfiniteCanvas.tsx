@@ -80,7 +80,7 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
 
   return (
     <div
-      className={`${selectedOption === "text" ? "cursor-text" : ""}w-screen h-screen overflow-hidden`}
+      className={`${selectedOption === "text" ? "cursor-text" : ""} w-screen h-screen overflow-hidden`}
       onWheel={handleWheel}
       onClick={(e) => {
         switch (selectedOption) {
