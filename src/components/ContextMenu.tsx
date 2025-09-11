@@ -13,7 +13,9 @@ const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
         style={{ top: pos.y, left: pos.x }}
         ref={ref}
       >
-        <button onClick={onDelete}>Delete</button>
+        <button onClick={onDelete} className="hover:text-black hover:bg-white">
+          Delete
+        </button>
       </div>
     );
   }
