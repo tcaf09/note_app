@@ -17,7 +17,6 @@ import {
 
 const Tiptap = ({
   selected,
-  onContextMenu,
 }: {
   selected: boolean;
   onContextMenu?: (e: React.MouseEvent) => void;
@@ -123,7 +122,7 @@ const Tiptap = ({
         </div>
       </BubbleMenu>
 
-      <EditorContent editor={editor} onContextMenu={onContextMenu} />
+      <EditorContent editor={editor}/>
     </>
   );
 };

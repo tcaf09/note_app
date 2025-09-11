@@ -85,7 +85,7 @@ function LoginSignup() {
 
   return (
     <div className="flex items-center justify-center h-screen">
-      <div className=" bg-black w-auto h-2/3 rounded-[25px] flex flex-col items-center justify-between px-10 py-5">
+      <div className=" bg-black w-auto h-2/3 rounded-[25px] flex flex-col items-center justify-between px-24 py-5">
         <div className="flex rounded-full bg-white justify-between w-full p-1">
           <p
             onClick={() => toggleOption("login")}

@@ -21,6 +21,7 @@ function Toolbar({
       </div>
     );
   };
+
   return (
     <div className=" absolute top-2 left-1/2 -translate-x-1/2 z-50 w-1/2 rounded-lg p-3 m-auto mt-2 bg-stone-950 flex ">
       <div
