@@ -22,12 +22,48 @@ type Props = {
 function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
   const [pos, setPos] = useState<Pos>({ x: 0, y: 0 });
   const [scale, setScale] = useState<number>(1);
+
   const contextRef = useRef<HTMLDivElement>(null);
   const [contextPos, setContextPos] = useState<Pos | null>(null);
-  const [textboxes, setTextboxes] = useState<Box[]>([]);
   const [contextTargetIndex, setContextTargetIndex] = useState<number | null>(
     null,
   );
+
+  const [textboxes, setTextboxes] = useState<Box[]>([]);
+
+  const [points, setPoints] = useState([]);
+
+  const getSvgPathFromStroke = (stroke: number[][]): string => {
+    if (!stroke.length) return "";
+
+    const d = stroke.reduce(
+      (acc, [x0, y0], i, arr) => {
+        const [x1, y1] = arr[(i + 1) % arr.length];
+        acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
+        return acc;
+      },
+      ["M", ...stroke[0], "Q"],
+    );
+
+    d.push("Z");
+    return d.join(" ");
+  };
+
+  const options = {
+    size: 16,
+    smoothing: 0.54,
+    thinning: 0.11,
+    streamline: 0.5,
+    easing: (t: number) => t,
+    start: {
+      taper: 0,
+      cap: true,
+    },
+    end: {
+      taper: 0,
+      cap: true,
+    },
+  };
 
   function handleWheel(e: React.WheelEvent) {
     if (e.ctrlKey) {
@@ -38,7 +74,7 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
   }
 
   const handleContextMenu = (e: React.MouseEvent, index: number) => {
-    e.stopPropagation()
+    e.stopPropagation();
     e.preventDefault();
     setContextPos({ x: e.clientX - pos.x, y: e.clientY - pos.y });
     setContextTargetIndex(index);
@@ -68,15 +104,18 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (contextRef.current && !contextRef.current.contains((e.target as Node))) {
+      if (
+        contextRef.current &&
+        !contextRef.current.contains(e.target as Node)
+      ) {
         setContextPos(null);
         setContextTargetIndex(null);
       }
     }
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <div
