@@ -40,7 +40,7 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
   const handleContextMenu = (e: React.MouseEvent, index: number) => {
     e.stopPropagation()
     e.preventDefault();
-    setContextPos({ x: e.clientX, y: e.clientY });
+    setContextPos({ x: e.clientX - pos.x, y: e.clientY - pos.y });
     setContextTargetIndex(index);
   };
 
