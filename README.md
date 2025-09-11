@@ -1,4 +1,4 @@
-# The Ultimate Note App
+# The Ultimate Note App (TUNA)
 
 This is a note app to defeat all note apps. It provides text-editing...
 
