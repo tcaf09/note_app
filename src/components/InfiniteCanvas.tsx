@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import Textbox from "./Textbox";
 import ContextMenu from "./ContextMenu";
+import { getStroke } from "perfect-freehand";
 
 type Pos = {
   x: number;
@@ -34,7 +35,9 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
 
   const [textboxes, setTextboxes] = useState<Box[]>([]);
 
-  const [points, setPoints] = useState([]);
+  const [points, setPoints] = useState<[any, any, any][]>([]);
+  const [paths, setPaths] = useState<string[]>([]);
+  const drawing = useRef<boolean>(false);
 
   const startPan = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -91,6 +94,20 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
       cap: true,
     },
   };
+
+  function handlePointerDown(e: any) {
+    e.target.setPointerCapture(e.pointerId);
+    setPoints([[e.clientX - pos.x, e.clientY - pos.y, e.pressure]]);
+    drawing.current = true;
+  }
+
+  function handlePointerMove(e: any) {
+    if (e.buttons !== 1) return;
+    setPoints([...points, [e.clientX - pos.x, e.clientY - pos.y, e.pressure]]);
+  }
+
+  const stroke = getStroke(points, options);
+  const pathData = getSvgPathFromStroke(stroke);
 
   const handleContextMenu = (e: React.MouseEvent, index: number) => {
     e.stopPropagation();
@@ -177,6 +194,34 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
             onDelete={deleteTextbox}
           />
         )}
+        <svg
+          onPointerDown={(e) => {
+            if (selectedOption !== "pen") return;
+            handlePointerDown(e);
+          }}
+          onPointerMove={(e) => {
+            if (selectedOption !== "pen") return;
+            handlePointerMove(e);
+          }}
+          onPointerUp={() => {
+            setPaths([...paths, pathData]);
+            drawing.current = false;
+          }}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            touchAction: "none",
+            pointerEvents: selectedOption === "pen" ? "auto" : "none",
+          }}
+        >
+          {drawing && <path d={pathData} />}
+          {paths.map((e, i) => (
+            <path d={e} key={i} />
+          ))}
+        </svg>
       </div>
     </div>
   );
