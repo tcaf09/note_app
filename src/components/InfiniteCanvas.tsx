@@ -26,12 +26,39 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
   const contextRef = useRef<HTMLDivElement>(null);
   const [contextPos, setContextPos] = useState<Pos | null>(null);
   const [contextTargetIndex, setContextTargetIndex] = useState<number | null>(
-    null,
+    null
   );
+
+  const isPanning = useRef<boolean>(false);
+  const panOffset = useRef<Pos>({ x: 0, y: 0 });
 
   const [textboxes, setTextboxes] = useState<Box[]>([]);
 
   const [points, setPoints] = useState([]);
+
+  const startPan = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    window.addEventListener("mousemove", pan);
+    window.addEventListener("mouseup", stopPan);
+
+    panOffset.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
+    isPanning.current = true;
+  };
+
+  const pan = (e: MouseEvent) => {
+    if (!isPanning) return;
+    setPos({
+      x: e.clientX - panOffset.current.x,
+      y: e.clientY - panOffset.current.y,
+    });
+  };
+
+  const stopPan = () => {
+    isPanning.current = false;
+    window.removeEventListener("mousemove", pan);
+    window.removeEventListener("mouseup", stopPan);
+  };
 
   const getSvgPathFromStroke = (stroke: number[][]): string => {
     if (!stroke.length) return "";
@@ -42,7 +69,7 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
         acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
         return acc;
       },
-      ["M", ...stroke[0], "Q"],
+      ["M", ...stroke[0], "Q"]
     );
 
     d.push("Z");
@@ -65,14 +92,6 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
     },
   };
 
-  function handleWheel(e: React.WheelEvent) {
-    if (e.ctrlKey) {
-      setScale((s) => Math.max(0.1, s - e.deltaY * 0.001));
-    } else {
-      setPos((p) => ({ x: p.x - e.deltaX, y: p.y - e.deltaY }));
-    }
-  }
-
   const handleContextMenu = (e: React.MouseEvent, index: number) => {
     e.stopPropagation();
     e.preventDefault();
@@ -83,7 +102,7 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
   const deleteTextbox = () => {
     if (contextTargetIndex !== null) {
       setTextboxes((prev) =>
-        prev.filter((_, index) => index !== contextTargetIndex),
+        prev.filter((_, index) => index !== contextTargetIndex)
       );
       setContextPos(null);
       setContextTargetIndex(null);
@@ -96,7 +115,7 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
 
     setTextboxes((prev) => [
       ...prev,
-      { x: posx, y: posy, width: 100, height: 100 },
+      { x: posx - pos.x, y: posy - pos.y, width: 100, height: 100 },
     ]);
 
     setSelectedOption("mouse");
@@ -119,14 +138,9 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
 
   return (
     <div
-      className={`${selectedOption === "text" ? "cursor-text" : ""} w-screen h-screen overflow-hidden`}
-      onWheel={handleWheel}
-      onClick={(e) => {
-        switch (selectedOption) {
-          case "text":
-            addTextbox(e);
-        }
-      }}
+      className={`${
+        selectedOption === "text" ? "cursor-text" : ""
+      } w-screen h-screen overflow-hidden`}
     >
       <div
         className="relative"
@@ -135,6 +149,18 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
           height: 5000,
           transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`,
           transformOrigin: "0, 0",
+        }}
+        onClick={(e) => {
+          switch (selectedOption) {
+            case "text":
+              addTextbox(e);
+          }
+        }}
+        onMouseDown={(e) => {
+          switch (selectedOption) {
+            case "pan":
+              startPan(e);
+          }
         }}
       >
         {textboxes.map((box, i) => (
