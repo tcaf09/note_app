@@ -4,7 +4,7 @@ import InfiniteCanvas from "@/components/InfiniteCanvas";
 
 function Note() {
   const [selectedOption, setSelectedOption] = useState<string>("");
-  const [colour, setColour] = useState<string>("#ffffff");
+  const [colour, setColour] = useState<string>("#E0E0E0");
 
   return (
     <>
@@ -12,6 +12,7 @@ function Note() {
         selected={selectedOption}
         setSelected={setSelectedOption}
         setColour={setColour}
+        colour={colour}
       />
       <InfiniteCanvas
         selectedOption={selectedOption}

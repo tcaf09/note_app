@@ -9,33 +9,38 @@ function Toolbar({
   selected,
   setSelected,
   setColour,
+  colour,
 }: {
   selected: string;
   setSelected: (v: string) => void;
   setColour: (v: string) => void;
+  colour: string
 }) {
-  const penColourOption = (colour: string) => {
+  const colours = ["#E0E0E0", "#6CA0DC", "#E07A5F", "#7FB069"];
+
+  const penColourOption = (c: string, index: number) => {
     return (
       <div
-        className={`h-auto w-auto my-auto rounded-full p-1 flex border ${selected === "pen" && colour === colour
+        className={`h-auto w-auto my-auto mx-2 rounded-full p-1 flex border ${selected === "pen" && colour === c
             ? "border-white bg-white/20"
             : "border-transparent"
           }`}
         onClick={() => {
           setSelected("pen");
-          setColour(colour);
+          setColour(c);
         }}
+        key={index}
       >
         <div
           className={`w-5 h-5 rounded-full`}
-          style={{ backgroundColor: colour }}
+          style={{ backgroundColor: c }}
         ></div>
       </div>
     );
   };
 
   return (
-    <div className=" absolute top-2 left-1/2 -translate-x-1/2 z-50 w-1/2 rounded-lg p-3 m-auto mt-2 bg-stone-950 flex ">
+    <div className=" absolute top-2 left-1/2 -translate-x-1/2 z-50 w-auto rounded-lg p-3 mt-2 bg-stone-950 flex ">
       <div
         className={`mx-2 ${selected === "mouse"
             ? "border-white bg-white/20"
@@ -71,7 +76,7 @@ function Toolbar({
       >
         <FaEraser />
       </div>
-      {penColourOption("#ffffff")}
+      {colours.map((c, i) => penColourOption(c, i))}
     </div>
   );
 }
