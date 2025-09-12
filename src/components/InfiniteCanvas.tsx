@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Textbox from "./Textbox";
 import ContextMenu from "./ContextMenu";
 import { getStroke } from "perfect-freehand";
@@ -15,19 +15,26 @@ type Box = {
   height: number;
 };
 
+type Path = {
+  path: string;
+  colour: string;
+  points: [number, number, number][];
+};
+
 type Props = {
   selectedOption: string;
   setSelectedOption: React.Dispatch<React.SetStateAction<string>>;
+  colour: string;
 };
 
-function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
+function InfiniteCanvas({ selectedOption, setSelectedOption, colour }: Props) {
   const [pos, setPos] = useState<Pos>({ x: 0, y: 0 });
   const [scale, setScale] = useState<number>(1);
 
   const contextRef = useRef<HTMLDivElement>(null);
   const [contextPos, setContextPos] = useState<Pos | null>(null);
   const [contextTargetIndex, setContextTargetIndex] = useState<number | null>(
-    null
+    null,
   );
 
   const isPanning = useRef<boolean>(false);
@@ -35,8 +42,8 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
 
   const [textboxes, setTextboxes] = useState<Box[]>([]);
 
-  const [points, setPoints] = useState<[any, any, any][]>([]);
-  const [paths, setPaths] = useState<string[]>([]);
+  const [points, setPoints] = useState<[number, number, number][]>([]);
+  const [paths, setPaths] = useState<Path[]>([]);
   const drawing = useRef<boolean>(false);
 
   const startPan = (e: React.MouseEvent) => {
@@ -72,7 +79,7 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
         acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
         return acc;
       },
-      ["M", ...stroke[0], "Q"]
+      ["M", ...stroke[0], "Q"],
     );
 
     d.push("Z");
@@ -95,19 +102,43 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
     },
   };
 
-  function handlePointerDown(e: any) {
-    e.target.setPointerCapture(e.pointerId);
+  function handlePointerDown(e: React.PointerEvent) {
+    (e.target as Element).setPointerCapture(e.pointerId);
     setPoints([[e.clientX - pos.x, e.clientY - pos.y, e.pressure]]);
     drawing.current = true;
   }
 
-  function handlePointerMove(e: any) {
+  function handlePointerMove(e: React.PointerEvent) {
     if (e.buttons !== 1) return;
     setPoints([...points, [e.clientX - pos.x, e.clientY - pos.y, e.pressure]]);
   }
 
+  const handlePointerUp = () => {
+    setPaths([...paths, { path: pathData, colour: colour, points: points }]);
+    setPoints([]);
+    drawing.current = false;
+  };
+
   const stroke = getStroke(points, options);
   const pathData = getSvgPathFromStroke(stroke);
+
+  function handleEraserMove(e: React.PointerEvent) {
+    if (e.buttons !== 1) return;
+
+    const x = e.clientX - pos.x;
+    const y = e.clientY - pos.y;
+
+    setPaths((prev) =>
+      prev.filter(
+        (p) =>
+          !p.points.some(([px, py]) => {
+            const dx = px - x;
+            const dy = py - y;
+            return Math.sqrt(dx * dx + dy * dy) < 20; // 20px eraser radius
+          }),
+      ),
+    );
+  }
 
   const handleContextMenu = (e: React.MouseEvent, index: number) => {
     e.stopPropagation();
@@ -119,7 +150,7 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
   const deleteTextbox = () => {
     if (contextTargetIndex !== null) {
       setTextboxes((prev) =>
-        prev.filter((_, index) => index !== contextTargetIndex)
+        prev.filter((_, index) => index !== contextTargetIndex),
       );
       setContextPos(null);
       setContextTargetIndex(null);
@@ -155,9 +186,8 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
 
   return (
     <div
-      className={`${
-        selectedOption === "text" ? "cursor-text" : ""
-      } w-screen h-screen overflow-hidden`}
+      className={`${selectedOption === "text" ? "cursor-text" : ""
+        } w-screen h-screen overflow-hidden`}
     >
       <div
         className="relative"
@@ -196,17 +226,18 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
         )}
         <svg
           onPointerDown={(e) => {
-            if (selectedOption !== "pen") return;
-            handlePointerDown(e);
+            if (selectedOption === "pen") {
+              handlePointerDown(e);
+            }
           }}
           onPointerMove={(e) => {
-            if (selectedOption !== "pen") return;
-            handlePointerMove(e);
+            if (selectedOption === "pen") {
+              handlePointerMove(e);
+            } else if (selectedOption === "eraser") {
+              handleEraserMove(e)
+            }
           }}
-          onPointerUp={() => {
-            setPaths([...paths, pathData]);
-            drawing.current = false;
-          }}
+          onPointerUp={handlePointerUp}
           style={{
             position: "fixed",
             top: 0,
@@ -214,12 +245,15 @@ function InfiniteCanvas({ selectedOption, setSelectedOption }: Props) {
             width: "100%",
             height: "100%",
             touchAction: "none",
-            pointerEvents: selectedOption === "pen" ? "auto" : "none",
+            pointerEvents:
+              selectedOption === "pen" || selectedOption === "eraser"
+                ? "auto"
+                : "none",
           }}
         >
-          {drawing && <path d={pathData} />}
+          {drawing && <path d={pathData} fill={colour} />}
           {paths.map((e, i) => (
-            <path d={e} key={i} />
+            <path d={e.path} key={i} fill={e.colour} />
           ))}
         </svg>
       </div>

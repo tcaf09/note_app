@@ -1,4 +1,9 @@
-import { FaHandPaper, FaICursor, FaMousePointer } from "react-icons/fa";
+import {
+  FaEraser,
+  FaHandPaper,
+  FaICursor,
+  FaMousePointer,
+} from "react-icons/fa";
 
 function Toolbar({
   selected,
@@ -12,17 +17,19 @@ function Toolbar({
   const penColourOption = (colour: string) => {
     return (
       <div
-        className={`h-auto w-auto my-auto rounded-full p-1 flex border ${
-          selected === "pen" && colour === colour
+        className={`h-auto w-auto my-auto rounded-full p-1 flex border ${selected === "pen" && colour === colour
             ? "border-white bg-white/20"
             : "border-transparent"
-        }`}
+          }`}
         onClick={() => {
           setSelected("pen");
           setColour(colour);
         }}
       >
-        <div className={`w-5 h-5 rounded-full bg-${colour}`}></div>
+        <div
+          className={`w-5 h-5 rounded-full`}
+          style={{ backgroundColor: colour }}
+        ></div>
       </div>
     );
   };
@@ -30,35 +37,41 @@ function Toolbar({
   return (
     <div className=" absolute top-2 left-1/2 -translate-x-1/2 z-50 w-1/2 rounded-lg p-3 m-auto mt-2 bg-stone-950 flex ">
       <div
-        className={`mx-2 ${
-          selected === "mouse"
+        className={`mx-2 ${selected === "mouse"
             ? "border-white bg-white/20"
             : "border-transparent"
-        } border w-fit p-2 rounded-md text-white`}
+          } border w-fit p-2 rounded-md text-white`}
         onClick={() => setSelected("mouse")}
       >
         <FaMousePointer />
       </div>
       <div
-        className={`mx-2 ${
-          selected === "text"
+        className={`mx-2 ${selected === "text"
             ? "border-white bg-white/20"
             : "border-transparent"
-        } border w-fit p-2 rounded-md  text-white`}
+          } border w-fit p-2 rounded-md  text-white`}
         onClick={() => setSelected("text")}
       >
         <FaICursor />
       </div>
       <div
-        className={`mx-2 ${
-          selected === "pan" ? "border-white bg-white/20" : "border-transparent"
-        } border w-fit p-2 rounded-md  text-white`}
+        className={`mx-2 ${selected === "pan" ? "border-white bg-white/20" : "border-transparent"
+          } border w-fit p-2 rounded-md  text-white`}
         onClick={() => setSelected("pan")}
       >
         <FaHandPaper />
       </div>
       <div className="border mx-3 border-white h-8"></div>
-      {penColourOption("white")}
+      <div
+        className={`mx-2 ${selected === "eraser"
+            ? "border-white bg-white/20"
+            : "border-transparent"
+          } border w-fit p-2 rounded-md  text-white`}
+        onClick={() => setSelected("eraser")}
+      >
+        <FaEraser />
+      </div>
+      {penColourOption("#ffffff")}
     </div>
   );
 }
