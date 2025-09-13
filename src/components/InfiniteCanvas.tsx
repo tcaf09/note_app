@@ -203,7 +203,7 @@ function InfiniteCanvas({ selectedOption, setSelectedOption, colour }: Props) {
               addTextbox(e);
           }
         }}
-        onMouseDown={(e) => {
+        onPointerDown={(e) => {
           switch (selectedOption) {
             case "pan":
               startPan(e);
