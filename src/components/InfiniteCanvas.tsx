@@ -34,7 +34,7 @@ function InfiniteCanvas({ selectedOption, setSelectedOption, colour }: Props) {
   const contextRef = useRef<HTMLDivElement>(null);
   const [contextPos, setContextPos] = useState<Pos | null>(null);
   const [contextTargetIndex, setContextTargetIndex] = useState<number | null>(
-    null,
+    null
   );
 
   const isPanning = useRef<boolean>(false);
@@ -54,20 +54,27 @@ function InfiniteCanvas({ selectedOption, setSelectedOption, colour }: Props) {
 
     panOffset.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
     isPanning.current = true;
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
   };
 
   const pan = (e: PointerEvent) => {
-    if (!isPanning) return;
+    if (!isPanning.current) return;
+    e.stopPropagation();
+
     setPos({
       x: e.clientX - panOffset.current.x,
       y: e.clientY - panOffset.current.y,
     });
   };
 
-  const stopPan = () => {
+  const stopPan = (e?: PointerEvent) => {
     isPanning.current = false;
     window.removeEventListener("pointermove", pan);
     window.removeEventListener("pointerup", stopPan);
+
+    if (e) {
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    }
   };
 
   const getSvgPathFromStroke = (stroke: number[][]): string => {
@@ -79,7 +86,7 @@ function InfiniteCanvas({ selectedOption, setSelectedOption, colour }: Props) {
         acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
         return acc;
       },
-      ["M", ...stroke[0], "Q"],
+      ["M", ...stroke[0], "Q"]
     );
 
     d.push("Z");
@@ -135,8 +142,8 @@ function InfiniteCanvas({ selectedOption, setSelectedOption, colour }: Props) {
             const dx = px - x;
             const dy = py - y;
             return Math.sqrt(dx * dx + dy * dy) < 20; // 20px eraser radius
-          }),
-      ),
+          })
+      )
     );
   }
 
@@ -150,7 +157,7 @@ function InfiniteCanvas({ selectedOption, setSelectedOption, colour }: Props) {
   const deleteTextbox = () => {
     if (contextTargetIndex !== null) {
       setTextboxes((prev) =>
-        prev.filter((_, index) => index !== contextTargetIndex),
+        prev.filter((_, index) => index !== contextTargetIndex)
       );
       setContextPos(null);
       setContextTargetIndex(null);
@@ -186,8 +193,9 @@ function InfiniteCanvas({ selectedOption, setSelectedOption, colour }: Props) {
 
   return (
     <div
-      className={`${selectedOption === "text" ? "cursor-text" : ""
-        } w-screen h-screen overflow-hidden`}
+      className={`${
+        selectedOption === "text" ? "cursor-text" : ""
+      } w-screen h-screen overflow-hidden`}
     >
       <div
         className="relative"
@@ -196,6 +204,7 @@ function InfiniteCanvas({ selectedOption, setSelectedOption, colour }: Props) {
           height: 5000,
           transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`,
           transformOrigin: "0, 0",
+          touchAction: "none",
         }}
         onClick={(e) => {
           switch (selectedOption) {
@@ -234,7 +243,7 @@ function InfiniteCanvas({ selectedOption, setSelectedOption, colour }: Props) {
             if (selectedOption === "pen") {
               handlePointerMove(e);
             } else if (selectedOption === "eraser") {
-              handleEraserMove(e)
+              handleEraserMove(e);
             }
           }}
           onPointerUp={handlePointerUp}
