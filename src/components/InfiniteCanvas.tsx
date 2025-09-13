@@ -46,17 +46,17 @@ function InfiniteCanvas({ selectedOption, setSelectedOption, colour }: Props) {
   const [paths, setPaths] = useState<Path[]>([]);
   const drawing = useRef<boolean>(false);
 
-  const startPan = (e: React.MouseEvent) => {
+  const startPan = (e: React.PointerEvent) => {
     e.stopPropagation();
 
-    window.addEventListener("mousemove", pan);
-    window.addEventListener("mouseup", stopPan);
+    window.addEventListener("pointermove", pan);
+    window.addEventListener("pointerup", stopPan);
 
     panOffset.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
     isPanning.current = true;
   };
 
-  const pan = (e: MouseEvent) => {
+  const pan = (e: PointerEvent) => {
     if (!isPanning) return;
     setPos({
       x: e.clientX - panOffset.current.x,
@@ -66,8 +66,8 @@ function InfiniteCanvas({ selectedOption, setSelectedOption, colour }: Props) {
 
   const stopPan = () => {
     isPanning.current = false;
-    window.removeEventListener("mousemove", pan);
-    window.removeEventListener("mouseup", stopPan);
+    window.removeEventListener("pointermove", pan);
+    window.removeEventListener("pointerup", stopPan);
   };
 
   const getSvgPathFromStroke = (stroke: number[][]): string => {

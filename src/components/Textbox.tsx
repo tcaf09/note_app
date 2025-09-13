@@ -24,17 +24,17 @@ function Textbox({ props, handleContextMenu }: TextboxProps) {
   const boxRef = useRef<HTMLDivElement>(null);
   const resizeHandle = useRef<null | string>(null);
 
-  const startDrag = (e: React.MouseEvent) => {
+  const startDrag = (e: React.PointerEvent) => {
     e.stopPropagation();
 
-    window.addEventListener("mousemove", drag);
-    window.addEventListener("mouseup", stopDrag);
+    window.addEventListener("pointermove", drag);
+    window.addEventListener("pointerup", stopDrag);
 
     isDraging.current = true;
     offset.current = [e.clientX - box.x, e.clientY - box.y];
   };
 
-  const drag = (e: MouseEvent) => {
+  const drag = (e: PointerEvent) => {
     if (!isDraging.current) return;
     setBox((prev) => ({
       ...prev,
@@ -46,8 +46,8 @@ function Textbox({ props, handleContextMenu }: TextboxProps) {
   const stopDrag = () => {
     isDraging.current = false;
 
-    window.removeEventListener("mousemove", drag);
-    window.removeEventListener("mouseup", stopDrag);
+    window.removeEventListener("pointermove", drag);
+    window.removeEventListener("pointerup", stopDrag);
   };
 
   const startResize = (handle: string, e: React.MouseEvent) => {
@@ -141,7 +141,7 @@ function Textbox({ props, handleContextMenu }: TextboxProps) {
     >
       <div
         className="absolute w-[80%] h-2 left-[10%] -top-2 hover:cursor-grab"
-        onMouseDown={startDrag}
+        onPointerDown={startDrag}
       ></div>
       <div
         className="absolute w-[80%] h-1 left-[10%] -bottom-0.5 hover:cursor-ns-resize"
