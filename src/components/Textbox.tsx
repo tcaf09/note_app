@@ -7,7 +7,7 @@ type Box = {
   x: number;
   y: number;
   width: number;
-  height: number;
+  height: number | string;
 };
 
 type TextboxProps = {
@@ -94,14 +94,14 @@ function Textbox({ props, handleContextMenu }: TextboxProps) {
           break;
 
         case "topRight":
-          height = height + (y - e.clientY);
+          height = (height as number) + (y - e.clientY);
           width = e.clientX - x;
           y = e.clientY;
           break;
 
         case "topLeft":
           width = width + (x - e.clientX);
-          height = height + (y - e.clientY);
+          height = (height as number) + (y - e.clientY);
           y = e.clientY;
           x = e.clientX;
           break;
