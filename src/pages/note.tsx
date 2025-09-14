@@ -5,7 +5,8 @@ import InfiniteCanvas from "@/components/InfiniteCanvas";
 function Note() {
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [colour, setColour] = useState<string>("#E0E0E0");
-  const [penSize, setPenSize] = useState<number>(4);
+  const [penSizes, setPenSizes] = useState<number[]>([4, 4, 4, 4]);
+  const colours = ["#E0E0E0", "#6CA0DC", "#E07A5F", "#7FB069"];
 
   return (
     <>
@@ -14,14 +15,16 @@ function Note() {
         setSelected={setSelectedOption}
         setColour={setColour}
         colour={colour}
-        penSize={penSize}
-        setPenSize={setPenSize}
+        colours={colours}
+        penSizes={penSizes}
+        setPenSizes={setPenSizes}
       />
       <InfiniteCanvas
         selectedOption={selectedOption}
         setSelectedOption={setSelectedOption}
         colour={colour}
-        penSize={penSize}
+        colours={colours}
+        penSizes={penSizes}
       />
     </>
   );

@@ -11,17 +11,19 @@ function Toolbar({
   setSelected,
   setColour,
   colour,
-  penSize,
-  setPenSize,
+  colours,
+  penSizes,
+  setPenSizes,
 }: {
   selected: string;
   setSelected: (v: string) => void;
   setColour: (v: string) => void;
   colour: string;
-  penSize: number;
-  setPenSize: (v: number) => void;
+  colours: string[];
+  penSizes: number[];
+  setPenSizes: React.Dispatch<React.SetStateAction<number[]>>
 }) {
-  const colours = ["#E0E0E0", "#6CA0DC", "#E07A5F", "#7FB069"];
+  
 
   return (
     <div className=" absolute top-2 left-1/2 -translate-x-1/2 z-50 w-auto rounded-lg p-3 mt-2 bg-stone-950 flex ">
@@ -68,8 +70,9 @@ function Toolbar({
           key={i}
           selected={selected}
           setSelected={setSelected}
-          penSize={penSize}
-          setPenSize={setPenSize}
+          penSizes={penSizes}
+          setPenSizes={setPenSizes}
+          index={i}
         />
       ))}
     </div>

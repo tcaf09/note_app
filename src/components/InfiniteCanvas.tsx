@@ -25,10 +25,17 @@ type Props = {
   selectedOption: string;
   setSelectedOption: React.Dispatch<React.SetStateAction<string>>;
   colour: string;
-  penSize: number;
+  colours: string[];
+  penSizes: number[];
 };
 
-function InfiniteCanvas({ selectedOption, setSelectedOption, colour, penSize }: Props) {
+function InfiniteCanvas({
+  selectedOption,
+  setSelectedOption,
+  colour,
+  colours,
+  penSizes,
+}: Props) {
   const [pos, setPos] = useState<Pos>({ x: 0, y: 0 });
   const [scale, setScale] = useState<number>(1);
 
@@ -95,7 +102,7 @@ function InfiniteCanvas({ selectedOption, setSelectedOption, colour, penSize }: 
   };
 
   const options = {
-    size: penSize * 4,
+    size: penSizes[colours.indexOf(colour)] * 4,
     smoothing: 0.54,
     thinning: 0.11,
     streamline: 0.5,
