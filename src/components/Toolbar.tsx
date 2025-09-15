@@ -105,6 +105,8 @@ function Toolbar({
               e.stopPropagation();
               setColours((prev) => [...prev, newColour]);
               setPenSizes((prev) => [...prev, 4]);
+              setColour(newColour);
+              setSelected("pen");
             }}
           >
             Add Colour
