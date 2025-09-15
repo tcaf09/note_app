@@ -50,20 +50,20 @@ function Textbox({ props, handleContextMenu }: TextboxProps) {
     window.removeEventListener("pointerup", stopDrag);
   };
 
-  const startResize = (handle: string, e: React.MouseEvent) => {
+  const startResize = (handle: string, e: React.PointerEvent) => {
     e.stopPropagation();
     resizeHandle.current = handle;
-    document.addEventListener("mousemove", resize);
-    document.addEventListener("mouseup", stopResize);
+    document.addEventListener("pointermove", resize);
+    document.addEventListener("pointerup", stopResize);
   };
 
   const stopResize = () => {
     resizeHandle.current = null;
-    document.removeEventListener("mousemove", resize);
-    document.removeEventListener("mouseup", stopResize);
+    document.removeEventListener("pointermove", resize);
+    document.removeEventListener("pointerup", stopResize);
   };
 
-  const resize = (e: MouseEvent) => {
+  const resize = (e: PointerEvent) => {
     if (!resizeHandle.current) return;
     setBox((prev) => {
       let { x, y, width, height } = prev;
@@ -127,7 +127,9 @@ function Textbox({ props, handleContextMenu }: TextboxProps) {
 
   return (
     <div
-      className={`absolute border-2 border-t-8 ${selected ? "border-stone-700" : "border-transparent"} hover:border-stone-700`}
+      className={`absolute border-2 border-t-8 ${
+        selected ? "border-stone-700" : "border-transparent"
+      } hover:border-stone-700`}
       style={{
         left: box.x,
         top: box.y,
@@ -145,32 +147,32 @@ function Textbox({ props, handleContextMenu }: TextboxProps) {
       ></div>
       <div
         className="absolute w-[80%] h-1 left-[10%] -bottom-0.5 hover:cursor-ns-resize"
-        onMouseDown={(e) => startResize("bottom", e)}
+        onPointerDown={(e) => startResize("bottom", e)}
       ></div>
       <div
         className="absolute h-[80%] w-1 top-[10%] -left-0.5 hover:cursor-ew-resize"
-        onMouseDown={(e) => startResize("left", e)}
+        onPointerDown={(e) => startResize("left", e)}
       ></div>
       <div
         className="absolute h-[80%] w-1 top-[10%] -right-0.5 hover:cursor-ew-resize"
-        onMouseDown={(e) => startResize("right", e)}
+        onPointerDown={(e) => startResize("right", e)}
       ></div>
 
       <div
         className="absolute w-2 h-2 -top-1 -left-1 hover:cursor-nwse-resize"
-        onMouseDown={(e) => startResize("topLeft", e)}
+        onPointerDown={(e) => startResize("topLeft", e)}
       ></div>
       <div
         className="absolute w-2 h-2 -top-1 -right-1 hover:cursor-nesw-resize"
-        onMouseDown={(e) => startResize("topRight", e)}
+        onPointerDown={(e) => startResize("topRight", e)}
       ></div>
       <div
         className="absolute w-2 h-2 -bottom-1 -left-1 hover:cursor-nesw-resize"
-        onMouseDown={(e) => startResize("bottomLeft", e)}
+        onPointerDown={(e) => startResize("bottomLeft", e)}
       ></div>
       <div
         className="absolute w-2 h-2 -bottom-1 -right-1 hover:cursor-nwse-resize"
-        onMouseDown={(e) => startResize("bottomRight", e)}
+        onPointerDown={(e) => startResize("bottomRight", e)}
       ></div>
       <Tiptap selected={selected} />
     </div>
