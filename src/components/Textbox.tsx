@@ -52,6 +52,7 @@ function Textbox({ props, handleContextMenu }: TextboxProps) {
 
   const startResize = (handle: string, e: React.PointerEvent) => {
     e.stopPropagation();
+    (e.target as Element).setPointerCapture(e.pointerId);
     resizeHandle.current = handle;
     document.addEventListener("pointermove", resize);
     document.addEventListener("pointerup", stopResize);
