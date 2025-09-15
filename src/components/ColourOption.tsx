@@ -7,8 +7,10 @@ type Props = {
   selected: string;
   setSelected: (v: string) => void;
   penSizes: number[];
-  setPenSizes: React.Dispatch<React.SetStateAction<number[]>>
+  setPenSizes: React.Dispatch<React.SetStateAction<number[]>>;
   index: number;
+  colours: string[];
+  setColours: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 function ColourOption({
@@ -20,6 +22,8 @@ function ColourOption({
   penSizes,
   setPenSizes,
   index,
+  colours,
+  setColours,
 }: Props) {
   const [menuShown, setMenuShown] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -61,7 +65,7 @@ function ColourOption({
       <div
         className={`${
           menuShown ? "absolute" : "hidden"
-        } left-1/2 -translate-x-1/2 top-[150%] w-40 bg-stone-950 p-2 rounded-lg`}
+        } left-1/2 -translate-x-1/2 top-[150%] w-40 flex flex-col bg-stone-950 p-2 rounded-lg`}
         ref={menuRef}
       >
         <input
@@ -81,6 +85,17 @@ function ColourOption({
             width: "100%",
           }}
         />
+        <button
+          className="p-2 border text-white border-white hover:bg-white/20 my-2 rounded-md"
+          onClick={(e) => {
+            e.stopPropagation();
+            const indexRemove = colours.indexOf(c);
+            setPenSizes((prev) => prev.filter((_, i) => i !== indexRemove));
+            setColours((prev) => prev.filter((col) => col !== c));
+          }}
+        >
+          Delete
+        </button>
       </div>
     </div>
   );
