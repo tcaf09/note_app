@@ -126,13 +126,14 @@ function InfiniteCanvas({
   };
 
   function handlePointerDown(e: React.PointerEvent) {
+    if (e.pointerType === "touch") return;
     (e.target as Element).setPointerCapture(e.pointerId);
     setPoints([[e.clientX - pos.x, e.clientY - pos.y, e.pressure]]);
     drawing.current = true;
   }
 
   function handlePointerMove(e: React.PointerEvent) {
-    if (e.buttons !== 1) return;
+    if (e.buttons !== 1 || e.pointerType === "touch") return;
     setPoints([...points, [e.clientX - pos.x, e.clientY - pos.y, e.pressure]]);
   }
 
