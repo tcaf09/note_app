@@ -69,10 +69,18 @@ function InfiniteCanvas({
     if (!isPanning.current) return;
     e.stopPropagation();
 
-    setPos({
-      x: e.clientX - panOffset.current.x,
-      y: e.clientY - panOffset.current.y,
-    });
+    const newX = e.clientX - panOffset.current.x;
+    const newY = e.clientY - panOffset.current.y;
+
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const canvasWidth = 5000;
+    const canvasHeight = 5000;
+
+    const clampedX = Math.min(0, Math.max(newX, viewportWidth - canvasWidth));
+    const clampedY = Math.min(0, Math.max(newY, viewportHeight - canvasHeight));
+
+    setPos({ x: clampedX, y: clampedY });
   };
 
   const stopPan = (e?: PointerEvent) => {
