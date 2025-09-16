@@ -9,7 +9,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   let collection = await db.collection("Users");
   let results = await collection.find({}).toArray();
-  res.status(204).send(results);
+  res.status(200).send(results);
 })
 
 router.post("/register", async (req, res) => {
@@ -30,7 +30,7 @@ router.post("/register", async (req, res) => {
     }
     const existingEmail = await collection.findOne({email});
     if (existingEmail) {
-      res.status(409).send("Already an account with that email");
+      return res.status(409).send("Already an account with that email");
     }
     let result = await collection.insertOne(newUser);
     res.status(204).send(result)
