@@ -45,4 +45,5 @@ server/.env
 # Misc
 # =====================
 *.log
+node_modules
 
