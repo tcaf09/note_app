@@ -1,6 +1,13 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 function LoginSignup() {
+  const userRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const confPasswordRef = useRef<HTMLInputElement>(null);
+
+  const [error, setError] = useState<string | null>(null);
+
   const loginForm = (
     <>
       <div>
@@ -12,6 +19,7 @@ function LoginSignup() {
           type="text"
           id="username"
           className="p-2 rounded-lg focus:outline-none"
+          ref={userRef}
         />
       </div>
       <div>
@@ -23,6 +31,7 @@ function LoginSignup() {
           type="password"
           id="password"
           className="p-2 rounded-lg focus:outline-none"
+          ref={passwordRef}
         />
       </div>
     </>
@@ -39,6 +48,7 @@ function LoginSignup() {
           type="email"
           id="email"
           className="p-2 rounded-lg focus:outline-none"
+          ref={emailRef}
         />
       </div>
       <div>
@@ -50,6 +60,7 @@ function LoginSignup() {
           type="text"
           id="username"
           className="p-2 rounded-lg focus:outline-none"
+          ref={userRef}
         />
       </div>
       <div>
@@ -61,6 +72,7 @@ function LoginSignup() {
           type="password"
           id="password"
           className="p-2 rounded-lg focus:outline-none"
+          ref={passwordRef}
         />
       </div>
       <div>
@@ -72,6 +84,7 @@ function LoginSignup() {
           type="password"
           id="confirmPassword"
           className="p-2 rounded-lg focus:outline-none"
+          ref={confPasswordRef}
         />
       </div>
     </>
@@ -79,9 +92,47 @@ function LoginSignup() {
 
   const toggleOption = (option: "login" | "signup") => {
     setOption(option);
+    setError(null);
   };
 
   const [option, setOption] = useState<"login" | "signup">("login");
+  async function login(username: string, password: string) {
+    try {
+      const res = await fetch("http://localhost:5000/api/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message);
+        return;
+      }
+
+      localStorage.setItem("token", data.accessToken);
+      console.log(`Login Successful. Token: ${data.accessToken}`);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async function signUp(username: string, password: string, email: string) {
+    try {
+      const res = await fetch("http://localhost:5000/api/users/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password, email }),
+      });
+
+      if (!res.ok) throw new Error("Signup Failed");
+
+      console.log("User Created");
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   return (
     <div className="flex items-center justify-center h-screen">
@@ -89,16 +140,14 @@ function LoginSignup() {
         <div className="flex rounded-full bg-white justify-between w-full p-1">
           <p
             onClick={() => toggleOption("login")}
-            className={`cursor-pointer rounded-full ${
-              option === "login" ? "bg-black text-white" : "text-black"
-            } px-10 py-2`}
+            className={`cursor-pointer rounded-full ${option === "login" ? "bg-black text-white" : "text-black"
+              } px-10 py-2`}
           >
             Login
           </p>
           <p
-            className={`cursor-pointer rounded-full px-5 py-2 ${
-              option === "signup" ? "bg-black text-white" : "text-black"
-            }`}
+            className={`cursor-pointer rounded-full px-5 py-2 ${option === "signup" ? "bg-black text-white" : "text-black"
+              }`}
             onClick={() => {
               toggleOption("signup");
             }}
@@ -106,10 +155,39 @@ function LoginSignup() {
             Signup
           </p>
         </div>
+        <div className="h-12 w-full mb-4">
+          {error && (
+            <div className="p-1 border border-red-900 rounded-lg my-10 bg-red-900/20 text-red-900">
+              {error}
+            </div>
+          )}
+        </div>
         <div className="flex flex-col grow justify-evenly">
           {option === "login" ? loginForm : signupForm}
         </div>
-        <button className="border-none bg-white w-3/4 rounded-full py-2">
+        <button
+          className="border-none bg-white w-3/4 rounded-full py-2"
+          onClick={() => {
+            if (option === "login" && userRef.current && passwordRef.current) {
+              login(userRef.current.value, passwordRef.current.value);
+            }
+            if (
+              option === "signup" &&
+              userRef.current &&
+              emailRef.current &&
+              passwordRef.current &&
+              confPasswordRef.current
+            ) {
+              if (passwordRef.current.value === confPasswordRef.current.value) {
+                signUp(
+                  userRef.current.value,
+                  passwordRef.current.value,
+                  emailRef.current.value,
+                );
+              }
+            }
+          }}
+        >
           {option === "login" ? "Login" : "Sign Up"}
         </button>
       </div>
