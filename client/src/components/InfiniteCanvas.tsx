@@ -54,6 +54,23 @@ function InfiniteCanvas({
   const [paths, setPaths] = useState<Path[]>([]);
   const drawing = useRef<boolean>(false);
 
+  function resetGestures(e?: React.PointerEvent) {
+    drawing.current = false;
+
+    if (isPanning.current) {
+      window.removeEventListener("pointermove", pan);
+      window.removeEventListener("pointerup", stopPan);
+      isPanning.current = false;
+    }
+    setPoints([]);
+
+    if (e) {
+      try {
+        (e.target as Element).releasePointerCapture(e.pointerId);
+      } catch {}
+    }
+  }
+
   const startPan = (e: React.PointerEvent) => {
     e.stopPropagation();
 
@@ -66,7 +83,7 @@ function InfiniteCanvas({
   };
 
   const pan = (e: PointerEvent) => {
-    if (!isPanning.current) return;
+    if (!isPanning.current || drawing.current) return;
     e.stopPropagation();
 
     const newX = e.clientX - panOffset.current.x;
@@ -224,15 +241,13 @@ function InfiniteCanvas({
           touchAction: "none",
         }}
         onClick={(e) => {
-          switch (selectedOption) {
-            case "text":
-              addTextbox(e);
+          if (selectedOption === "text") {
+            addTextbox(e);
           }
         }}
         onPointerDown={(e) => {
-          switch (selectedOption) {
-            case "pan":
-              startPan(e);
+          if (selectedOption === "pan") {
+            startPan(e);
           }
         }}
       >
@@ -252,18 +267,29 @@ function InfiniteCanvas({
         )}
         <svg
           onPointerDown={(e) => {
-            if (selectedOption === "pen") {
+            if (e.pointerType === "pen" && selectedOption !== "eraser") {
+              resetGestures(e);
+              setSelectedOption("pen");
               handlePointerDown(e);
+            } else if (e.pointerType === "touch") {
+              resetGestures(e);
+              setSelectedOption("pan");
+              startPan(e);
             }
           }}
           onPointerMove={(e) => {
-            if (selectedOption === "pen") {
+            if (selectedOption === "pen" && drawing.current) {
               handlePointerMove(e);
             } else if (selectedOption === "eraser") {
               handleEraserMove(e);
             }
           }}
-          onPointerUp={handlePointerUp}
+          onPointerUp={(e) => {
+            if (selectedOption === "pen" && drawing.current) {
+              handlePointerUp();
+            }
+            resetGestures(e);
+          }}
           style={{
             position: "fixed",
             top: 0,
@@ -271,10 +297,10 @@ function InfiniteCanvas({
             width: "100%",
             height: "100%",
             touchAction: "none",
-            pointerEvents:
-              selectedOption === "pen" || selectedOption === "eraser"
-                ? "auto"
-                : "none",
+            // pointerEvents:
+            //   selectedOption === "pen" || selectedOption === "eraser"
+            //     ? "auto"
+            //     : "none",
           }}
         >
           {drawing && <path d={pathData} fill={colour} />}
