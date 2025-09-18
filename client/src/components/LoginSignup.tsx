@@ -18,7 +18,7 @@ function LoginSignup() {
         <input
           type="text"
           id="username"
-          className="p-2 rounded-lg focus:outline-none"
+          className="p-2 rounded-lg bg-white focus:outline-none"
           ref={userRef}
         />
       </div>
@@ -30,7 +30,7 @@ function LoginSignup() {
         <input
           type="password"
           id="password"
-          className="p-2 rounded-lg focus:outline-none"
+          className="p-2 rounded-lg bg-white focus:outline-none"
           ref={passwordRef}
         />
       </div>
@@ -47,7 +47,7 @@ function LoginSignup() {
         <input
           type="email"
           id="email"
-          className="p-2 rounded-lg focus:outline-none"
+          className="p-2 rounded-lg bg-white focus:outline-none"
           ref={emailRef}
         />
       </div>
@@ -59,7 +59,7 @@ function LoginSignup() {
         <input
           type="text"
           id="username"
-          className="p-2 rounded-lg focus:outline-none"
+          className="p-2 rounded-lg bg-white focus:outline-none"
           ref={userRef}
         />
       </div>
@@ -71,7 +71,7 @@ function LoginSignup() {
         <input
           type="password"
           id="password"
-          className="p-2 rounded-lg focus:outline-none"
+          className="p-2 rounded-lg bg-white focus:outline-none"
           ref={passwordRef}
         />
       </div>
@@ -83,7 +83,7 @@ function LoginSignup() {
         <input
           type="password"
           id="confirmPassword"
-          className="p-2 rounded-lg focus:outline-none"
+          className="p-2 rounded-lg bg-white focus:outline-none"
           ref={confPasswordRef}
         />
       </div>
@@ -140,14 +140,16 @@ function LoginSignup() {
         <div className="flex rounded-full bg-white justify-between w-full p-1">
           <p
             onClick={() => toggleOption("login")}
-            className={`cursor-pointer rounded-full ${option === "login" ? "bg-black text-white" : "text-black"
-              } px-10 py-2`}
+            className={`cursor-pointer rounded-full ${
+              option === "login" ? "bg-black text-white" : "text-black"
+            } px-10 py-2`}
           >
             Login
           </p>
           <p
-            className={`cursor-pointer rounded-full px-5 py-2 ${option === "signup" ? "bg-black text-white" : "text-black"
-              }`}
+            className={`cursor-pointer rounded-full px-5 py-2 ${
+              option === "signup" ? "bg-black text-white" : "text-black"
+            }`}
             onClick={() => {
               toggleOption("signup");
             }}
@@ -166,7 +168,7 @@ function LoginSignup() {
           {option === "login" ? loginForm : signupForm}
         </div>
         <button
-          className="border-none bg-white w-3/4 rounded-full py-2"
+          className="border-none bg-white w-3/4 rounded-full py-2 my-5"
           onClick={() => {
             if (option === "login" && userRef.current && passwordRef.current) {
               login(userRef.current.value, passwordRef.current.value);
@@ -182,7 +184,7 @@ function LoginSignup() {
                 signUp(
                   userRef.current.value,
                   passwordRef.current.value,
-                  emailRef.current.value,
+                  emailRef.current.value
                 );
               }
             }
