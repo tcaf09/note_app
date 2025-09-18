@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function LoginSignup() {
   const userRef = useRef<HTMLInputElement>(null);
@@ -7,6 +8,8 @@ function LoginSignup() {
   const confPasswordRef = useRef<HTMLInputElement>(null);
 
   const [error, setError] = useState<string | null>(null);
+
+  const navigate = useNavigate();
 
   const loginForm = (
     <>
@@ -112,7 +115,7 @@ function LoginSignup() {
       }
 
       localStorage.setItem("token", data.accessToken);
-      console.log(`Login Successful. Token: ${data.accessToken}`);
+      navigate("/dashboard");
     } catch (err) {
       console.log(err);
     }
@@ -127,8 +130,7 @@ function LoginSignup() {
       });
 
       if (!res.ok) throw new Error("Signup Failed");
-
-      console.log("User Created");
+      navigate("/dashboard");
     } catch (err) {
       console.log(err);
     }
@@ -140,16 +142,14 @@ function LoginSignup() {
         <div className="flex rounded-full bg-white justify-between w-full p-1">
           <p
             onClick={() => toggleOption("login")}
-            className={`cursor-pointer rounded-full ${
-              option === "login" ? "bg-black text-white" : "text-black"
-            } px-10 py-2`}
+            className={`cursor-pointer rounded-full ${option === "login" ? "bg-black text-white" : "text-black"
+              } px-10 py-2`}
           >
             Login
           </p>
           <p
-            className={`cursor-pointer rounded-full px-5 py-2 ${
-              option === "signup" ? "bg-black text-white" : "text-black"
-            }`}
+            className={`cursor-pointer rounded-full px-5 py-2 ${option === "signup" ? "bg-black text-white" : "text-black"
+              }`}
             onClick={() => {
               toggleOption("signup");
             }}
@@ -168,7 +168,7 @@ function LoginSignup() {
           {option === "login" ? loginForm : signupForm}
         </div>
         <button
-          className="border-none bg-white w-3/4 rounded-full py-2 my-5"
+          className="border-none bg-white w-3/4 rounded-full py-2 my-5 cursor-pointer"
           onClick={() => {
             if (option === "login" && userRef.current && passwordRef.current) {
               login(userRef.current.value, passwordRef.current.value);
@@ -184,9 +184,13 @@ function LoginSignup() {
                 signUp(
                   userRef.current.value,
                   passwordRef.current.value,
-                  emailRef.current.value
+                  emailRef.current.value,
                 );
+              } else {
+                setError("Passwords must match");
               }
+            } else {
+              setError("All feilds required");
             }
           }}
         >
