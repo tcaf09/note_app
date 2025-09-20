@@ -1,7 +1,10 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Textbox from "./Textbox";
 import ContextMenu from "./ContextMenu";
 import { getStroke } from "perfect-freehand";
+import { useParams } from "react-router-dom";
+import { type JSONContent } from "@tiptap/react";
+import { v4 as uuid } from "uuid";
 
 type Pos = {
   x: number;
@@ -9,10 +12,12 @@ type Pos = {
 };
 
 type Box = {
+  id: string;
   x: number;
   y: number;
   width: number;
   height: number | "auto";
+  content: JSONContent;
 };
 
 type Path = {
@@ -36,13 +41,16 @@ function InfiniteCanvas({
   colours,
   penSizes,
 }: Props) {
+  const authToken = localStorage.getItem("token");
+  const { id } = useParams<{ id: string }>();
+
   const [pos, setPos] = useState<Pos>({ x: 0, y: 0 });
   const [scale, setScale] = useState<number>(1);
 
   const contextRef = useRef<HTMLDivElement>(null);
   const [contextPos, setContextPos] = useState<Pos | null>(null);
-  const [contextTargetIndex, setContextTargetIndex] = useState<number | null>(
-    null
+  const [contextTargetIndex, setContextTargetIndex] = useState<string | null>(
+    null,
   );
 
   const isPanning = useRef<boolean>(false);
@@ -53,6 +61,22 @@ function InfiniteCanvas({
   const [points, setPoints] = useState<[number, number, number][]>([]);
   const [paths, setPaths] = useState<Path[]>([]);
   const drawing = useRef<boolean>(false);
+
+  const saveNote = useCallback(
+    async (pathsToSave: Path[], boxesToSave: Box[]) => {
+      const res = await fetch(`http://localhost:5000/api/notes/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + authToken,
+        },
+        body: JSON.stringify({ paths: pathsToSave, textboxes: boxesToSave }),
+      });
+
+      if (!res.ok) throw new Error("Error saving note");
+    },
+    [id, authToken],
+  );
 
   function resetGestures(e?: React.PointerEvent) {
     drawing.current = false;
@@ -67,7 +91,9 @@ function InfiniteCanvas({
     if (e) {
       try {
         (e.target as Element).releasePointerCapture(e.pointerId);
-      } catch {}
+      } catch {
+        return;
+      }
     }
   }
 
@@ -119,7 +145,7 @@ function InfiniteCanvas({
         acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
         return acc;
       },
-      ["M", ...stroke[0], "Q"]
+      ["M", ...stroke[0], "Q"],
     );
 
     d.push("Z");
@@ -143,7 +169,7 @@ function InfiniteCanvas({
   };
 
   function handlePointerDown(e: React.PointerEvent) {
-    if (e.pointerType === "touch") return;
+    if (e.buttons !== 1 || e.pointerType === "touch") return;
     (e.target as Element).setPointerCapture(e.pointerId);
     setPoints([[e.clientX - pos.x, e.clientY - pos.y, e.pressure]]);
     drawing.current = true;
@@ -151,17 +177,25 @@ function InfiniteCanvas({
 
   function handlePointerMove(e: React.PointerEvent) {
     if (e.buttons !== 1 || e.pointerType === "touch") return;
-    setPoints([...points, [e.clientX - pos.x, e.clientY - pos.y, e.pressure]]);
+    setPoints((prev) => [
+      ...prev,
+      [e.clientX - pos.x, e.clientY - pos.y, e.pressure],
+    ]);
   }
 
   const handlePointerUp = () => {
-    setPaths([...paths, { path: pathData, colour: colour, points: points }]);
+    const stroke = getStroke(points, options);
+    const completedPathData = getSvgPathFromStroke(stroke);
+    setPaths((prev) => {
+      const newPaths = [
+        ...prev,
+        { path: completedPathData, colour: colour, points: points },
+      ];
+      return newPaths;
+    });
     setPoints([]);
     drawing.current = false;
   };
-
-  const stroke = getStroke(points, options);
-  const pathData = getSvgPathFromStroke(stroke);
 
   function handleEraserMove(e: React.PointerEvent) {
     if (e.buttons !== 1) return;
@@ -176,12 +210,12 @@ function InfiniteCanvas({
             const dx = px - x;
             const dy = py - y;
             return Math.sqrt(dx * dx + dy * dy) < 20; // 20px eraser radius
-          })
-      )
+          }),
+      ),
     );
   }
 
-  const handleContextMenu = (e: React.MouseEvent, index: number) => {
+  const handleContextMenu = (e: React.MouseEvent, index: string) => {
     e.stopPropagation();
     e.preventDefault();
     setContextPos({ x: e.clientX - pos.x, y: e.clientY - pos.y });
@@ -190,9 +224,7 @@ function InfiniteCanvas({
 
   const deleteTextbox = () => {
     if (contextTargetIndex !== null) {
-      setTextboxes((prev) =>
-        prev.filter((_, index) => index !== contextTargetIndex)
-      );
+      setTextboxes((prev) => prev.filter((b) => b.id !== contextTargetIndex));
       setContextPos(null);
       setContextTargetIndex(null);
     }
@@ -204,11 +236,24 @@ function InfiniteCanvas({
 
     setTextboxes((prev) => [
       ...prev,
-      { x: posx - pos.x, y: posy - pos.y, width: 100, height: "auto" },
+      {
+        id: uuid(),
+        x: posx - pos.x,
+        y: posy - pos.y,
+        width: 100,
+        height: "auto",
+        content: { type: "doc", content: [] },
+      },
     ]);
 
     setSelectedOption("mouse");
   };
+
+  function updateBoxContent(id: string, content: JSONContent) {
+    setTextboxes((prev) =>
+      prev.map((box) => (box.id === id ? { ...box, content: content } : box)),
+    );
+  }
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -225,11 +270,40 @@ function InfiniteCanvas({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    async function loadNote() {
+      try {
+        const res = await fetch(`http://localhost:5000/api/notes/${id}`, {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + authToken,
+            "Content-Type": "application/json",
+          },
+        });
+        if (!res.ok) throw new Error("Error loading note");
+
+        const data = await res.json();
+        setPaths(data.paths);
+        setTextboxes(data.textboxes);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    loadNote();
+  }, [id, authToken]);
+
+  useEffect(() => {
+    saveNote(paths, textboxes);
+  }, [textboxes, paths, saveNote]);
+
+  const stroke = getStroke(points, options);
+  const pathData = getSvgPathFromStroke(stroke);
+
   return (
     <div
-      className={`${
-        selectedOption === "text" ? "cursor-text" : ""
-      } w-screen h-screen overflow-hidden`}
+      className={`${selectedOption === "text" ? "cursor-text" : ""
+        } w-screen h-screen overflow-hidden`}
     >
       <div
         className="relative"
@@ -251,11 +325,19 @@ function InfiniteCanvas({
           }
         }}
       >
-        {textboxes.map((box, i) => (
+        {textboxes.map((box) => (
           <Textbox
-            key={i}
+            key={box.id}
             props={box}
-            handleContextMenu={(e) => handleContextMenu(e, i)}
+            handleContextMenu={(e) => handleContextMenu(e, box.id)}
+            onChange={updateBoxContent}
+            onResize={(id, updates) => {
+              setTextboxes((prev) =>
+                prev.map((box) =>
+                  box.id === id ? { ...box, ...updates } : box,
+                ),
+              );
+            }}
           />
         ))}
         {contextPos && (
@@ -270,6 +352,9 @@ function InfiniteCanvas({
             if (e.pointerType === "pen" && selectedOption !== "eraser") {
               resetGestures(e);
               setSelectedOption("pen");
+              handlePointerDown(e);
+            } else if (selectedOption === "pen" && e.pointerType === "mouse") {
+              resetGestures(e);
               handlePointerDown(e);
             } else if (e.pointerType === "touch") {
               resetGestures(e);
@@ -297,10 +382,7 @@ function InfiniteCanvas({
             width: "100%",
             height: "100%",
             touchAction: "none",
-            // pointerEvents:
-            //   selectedOption === "pen" || selectedOption === "eraser"
-            //     ? "auto"
-            //     : "none",
+            pointerEvents: selectedOption === "mouse" ? "none" : "auto",
           }}
         >
           {drawing && <path d={pathData} fill={colour} />}

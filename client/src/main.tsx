@@ -12,7 +12,7 @@ const router = createBrowserRouter([
     element: <LoginPage />
   },
   {
-    path: "/note",
+    path: "/note/:id",
     element: <Note />
   },
   {

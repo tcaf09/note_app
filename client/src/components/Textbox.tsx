@@ -1,21 +1,37 @@
 import { useEffect, useRef, useState } from "react";
 import Tiptap from "./Tiptap";
+import { type JSONContent } from "@tiptap/react";
 
 type Position = [number, number];
 
 type Box = {
+  id: string;
   x: number;
   y: number;
   width: number;
-  height: number | string;
+  height: number | "auto";
+  content: JSONContent;
 };
+
+// type Path = {
+//   path: string;
+//   colour: string;
+//   points: [number, number, number][];
+// };
 
 type TextboxProps = {
   props: Box;
   handleContextMenu: (e: React.MouseEvent) => void;
+  onChange: (id: string, content: JSONContent) => void;
+  onResize: (id: string, update: Partial<Box>) => void;
 };
 
-function Textbox({ props, handleContextMenu }: TextboxProps) {
+function Textbox({
+  props,
+  handleContextMenu,
+  onChange,
+  onResize,
+}: TextboxProps) {
   const [box, setBox] = useState<Box>(props);
   const [selected, setSelected] = useState<boolean>(true);
 
@@ -48,6 +64,15 @@ function Textbox({ props, handleContextMenu }: TextboxProps) {
 
     window.removeEventListener("pointermove", drag);
     window.removeEventListener("pointerup", stopDrag);
+
+    setBox((prev) => {
+      onResize(prev.id, {
+        x: prev.x,
+        y: prev.y,
+      });
+
+      return prev;
+    });
   };
 
   const startResize = (handle: string, e: React.PointerEvent) => {
@@ -62,6 +87,16 @@ function Textbox({ props, handleContextMenu }: TextboxProps) {
     resizeHandle.current = null;
     document.removeEventListener("pointermove", resize);
     document.removeEventListener("pointerup", stopResize);
+    setBox((prev) => {
+      onResize(prev.id, {
+        width: prev.width,
+        height: prev.height,
+        x: prev.x,
+        y: prev.y,
+      });
+
+      return prev;
+    });
   };
 
   const resize = (e: PointerEvent) => {
@@ -108,7 +143,7 @@ function Textbox({ props, handleContextMenu }: TextboxProps) {
           break;
       }
 
-      return { x, y, width, height };
+      return { ...prev, x, y, width, height };
     });
   };
 
@@ -128,9 +163,8 @@ function Textbox({ props, handleContextMenu }: TextboxProps) {
 
   return (
     <div
-      className={`absolute border-2 border-t-8 ${
-        selected ? "border-stone-700" : "border-transparent"
-      } hover:border-stone-700`}
+      className={`absolute border-2 border-t-8 ${selected ? "border-stone-700" : "border-transparent"
+        } hover:border-stone-700`}
       style={{
         left: box.x,
         top: box.y,
@@ -175,7 +209,7 @@ function Textbox({ props, handleContextMenu }: TextboxProps) {
         className="absolute w-2 h-2 -bottom-1 -right-1 hover:cursor-nwse-resize"
         onPointerDown={(e) => startResize("bottomRight", e)}
       ></div>
-      <Tiptap selected={selected} />
+      <Tiptap selected={selected} onChange={onChange} box={box} />
     </div>
   );
 }

@@ -180,17 +180,15 @@ function LoginSignup() {
               passwordRef.current &&
               confPasswordRef.current
             ) {
-              if (passwordRef.current.value === confPasswordRef.current.value) {
+              if (passwordRef.current.value !== confPasswordRef.current.value && option === "signup") {
+                setError("Passwords must match");
+              } else {
                 signUp(
                   userRef.current.value,
                   passwordRef.current.value,
                   emailRef.current.value,
                 );
-              } else {
-                setError("Passwords must match");
               }
-            } else {
-              setError("All feilds required");
             }
           }}
         >

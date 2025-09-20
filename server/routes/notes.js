@@ -15,24 +15,72 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 });
 
+router.get("/:id", authenticateToken, async (req, res) => {
+  const noteId = new ObjectId(req.params.id);
+
+  if (!ObjectId.isValid(noteId)) {
+    return res.status(400).send({ message: "Invalid note id" });
+  }
+  try {
+    const collection = db.collection("Notes");
+    const note = await collection.findOne({
+      user: req.user.username,
+      _id: noteId,
+    });
+    if (!note) {
+      return res.status(404).send({ message: "Note not found" });
+    }
+    res.status(200).send(note);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: "Server Error" });
+  }
+});
+
 router.delete("/:id", authenticateToken, async (req, res) => {
   const noteId = req.params.id;
 
   if (!ObjectId.isValid(noteId)) {
-    return res.status(400).send({message: "Invalid note id"})
+    return res.status(400).send({ message: "Invalid note id" });
   }
   try {
     const collection = db.collection("Notes");
-    const results = await collection.deleteOne({_id: new ObjectId(noteId)});
+    const results = await collection.deleteOne({ _id: new ObjectId(noteId) });
 
     if (results.deletedCount === 0) {
-      return res.status(404).send({message: "Note ntoe found"})
+      return res.status(404).send({ message: "Note note found" });
     }
 
-    res.status(200).send({message: "Note Deleted"})
+    res.status(200).send({ message: "Note Deleted" });
   } catch (err) {
     console.log(err);
-    res.status(500).send({message: "Server Error"})
+    res.status(500).send({ message: "Server Error" });
+  }
+});
+
+router.patch("/:id", authenticateToken, async (req, res) => {
+  const noteId = req.params.id;
+
+  if (!ObjectId.isValid(noteId)) {
+    return res.status(400).send({ message: "Invalid note id" });
+  }
+
+  try {
+    const query = { _id: new ObjectId(noteId), user: req.user.username };
+    const updates = {
+      $set: {
+        paths: req.body.paths,
+        textboxes: req.body.textboxes,
+      },
+    };
+
+    const collection = db.collection("Notes");
+    const result = await collection.updateOne(query, updates);
+
+    res.status(200).send(result);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: "Server error" });
   }
 });
 

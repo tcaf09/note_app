@@ -3,7 +3,7 @@ import Toolbar from "../components/Toolbar";
 import InfiniteCanvas from "@/components/InfiniteCanvas";
 
 function Note() {
-  const [selectedOption, setSelectedOption] = useState<string>("");
+  const [selectedOption, setSelectedOption] = useState<string>("mouse");
   const [colour, setColour] = useState<string>("#E0E0E0");
   const [penSizes, setPenSizes] = useState<number[]>([4, 4, 4, 4]);
   const [colours, setColours] = useState<string[]>([

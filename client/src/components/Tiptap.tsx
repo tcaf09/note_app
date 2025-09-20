@@ -1,7 +1,7 @@
 // src/Tiptap.tsx
 
 import { BubbleMenu } from "@tiptap/react/menus";
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor, EditorContent, type JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { FaBold, FaUnderline, FaItalic } from "react-icons/fa";
 import { useEffect } from "react";
@@ -14,15 +14,29 @@ import {
   DropdownMenuTrigger,
 } from "./tiptap-ui-primitive/dropdown-menu";
 
+type Box = {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number | string;
+  content: JSONContent;
+};
 
 const Tiptap = ({
   selected,
+  onChange,
+  box,
 }: {
   selected: boolean;
-  onContextMenu?: (e: React.MouseEvent) => void;
+  onChange: (id: string, content: JSONContent) => void;
+  box: Box
 }) => {
   const editor = useEditor({
     editable: selected,
+    onUpdate: ({editor}) => {
+      onChange(box.id, editor.getJSON())
+    },
     extensions: [
       StarterKit,
       Heading.configure({
@@ -35,6 +49,10 @@ const Tiptap = ({
       },
     },
   });
+
+  useEffect(() => {
+    editor.commands.setContent(box.content)
+  }, [editor, box])
 
   useEffect(() => {
     if (editor) {
@@ -122,7 +140,7 @@ const Tiptap = ({
         </div>
       </BubbleMenu>
 
-      <EditorContent editor={editor}/>
+      <EditorContent editor={editor} />
     </>
   );
 };
