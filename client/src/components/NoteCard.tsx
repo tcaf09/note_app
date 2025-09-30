@@ -1,26 +1,62 @@
 import { useRef } from "react";
-import { FaRegCalendar, FaRegTrashAlt } from "react-icons/fa";
+import { FaRegFolder, FaRegTrashAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
-function NoteCard() {
+type Note = {
+  _id: string;
+  name: string;
+  folderId: string;
+};
+
+type Folder = {
+  _id?: string;
+  name: string;
+  parentId?: string | null;
+};
+
+function NoteCard({
+  note,
+  folder,
+  setDeleteShown,
+  setNoteToDelete,
+}: {
+  note: Note;
+  folder: Folder;
+  setDeleteShown: (v: boolean) => void;
+  setNoteToDelete: (v: Note) => void;
+}) {
+  const navigate = useNavigate();
+
   const previewRef = useRef<HTMLDivElement>(null);
   return (
-    <div className="bg-stone-950 max-w-52 w-full mx-auto rounded-xl shadow-md">
+    <div
+      className="bg-stone-950 w-52 rounded-xl shadow-md"
+      onClick={() => navigate(`/note/${note._id}`)}
+    >
       <div
         ref={previewRef}
-        className="h-40 text-white flex items-center justify-center"
+        className="h-40 text-white flex items-center justify-center cursor-pointer"
       ></div>
-      <div className="bg-stone-900 p-2 rounded-b-xl flex">
+      <div className="bg-stone-900 p-2 rounded-b-xl flex justify-between">
         <div>
-          <p className="text-white text-xl">Note Name</p>
+          <p className="text-white text-xl">{note.name}</p>
           <div className="flex text-stone-500">
-            <FaRegCalendar className="my-1" />
-            <p className="mx-2">Monday 2/12</p>
+            <FaRegFolder className="my-1" />
+            <p className="mx-2">{folder.name}</p>
           </div>
         </div>
-        <div className="text-red-600 text-xl flex items-center justify-center grow cursor-pointer">
-          <div className="p-2 bg-transparent hover:bg-red-600/20 rounded-lg">
+        <div className="text-red-600 text-xl flex items-center justify-center">
+          <button
+            className="p-2 bg-transparent hover:bg-red-600/20 rounded-lg cursor-pointer"
+            style={{ transition: "all 0.3s ease-in-out" }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setNoteToDelete(note);
+              setDeleteShown(true);
+            }}
+          >
             <FaRegTrashAlt />
-          </div>
+          </button>
         </div>
       </div>
     </div>

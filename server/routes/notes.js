@@ -84,6 +84,37 @@ router.patch("/:id", authenticateToken, async (req, res) => {
   }
 });
 
+router.post("/", authenticateToken, async (req, res) => {
+  try {
+    const { name, folderId } = req.body;
+
+    if (!name || !folderId) {
+      return res
+        .status(400)
+        .send({ message: "Name and folder id are required" });
+    }
+
+    if (!ObjectId.isValid(folderId)) {
+      return res.status(400).send({ message: "Invalid folderId" });
+    }
+
+    const collection = db.collection("Notes");
+
+    const results = await collection.insertOne({
+      user: req.user.username,
+      name: name,
+      paths: [],
+      textboxes: [],
+      folderId: folderId,
+    });
+
+    res.status(200).send(results);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: "Server Error" });
+  }
+});
+
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];

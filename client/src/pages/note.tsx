@@ -1,8 +1,12 @@
 import { useState } from "react";
 import Toolbar from "../components/Toolbar";
 import InfiniteCanvas from "@/components/InfiniteCanvas";
+import { FaHome } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 function Note() {
+  const navigate = useNavigate();
+
   const [selectedOption, setSelectedOption] = useState<string>("mouse");
   const [colour, setColour] = useState<string>("#E0E0E0");
   const [penSizes, setPenSizes] = useState<number[]>([4, 4, 4, 4]);
@@ -25,6 +29,12 @@ function Note() {
         setPenSizes={setPenSizes}
         setColours={setColours}
       />
+      <div
+        className="absolute top-4 left-4 p-3 text-white text-2xl bg-stone-950 rounded-lg cursor-pointer z-50"
+        onClick={() => navigate("/dashboard")}
+      >
+        <FaHome />
+      </div>
       <InfiniteCanvas
         selectedOption={selectedOption}
         setSelectedOption={setSelectedOption}

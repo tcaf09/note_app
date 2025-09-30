@@ -43,6 +43,7 @@ function InfiniteCanvas({
 }: Props) {
   const authToken = localStorage.getItem("token");
   const { id } = useParams<{ id: string }>();
+  const isInitialLoad = useRef<boolean>(true);
 
   const [pos, setPos] = useState<Pos>({ x: 0, y: 0 });
   const [scale, setScale] = useState<number>(1);
@@ -294,7 +295,15 @@ function InfiniteCanvas({
   }, [id, authToken]);
 
   useEffect(() => {
-    saveNote(paths, textboxes);
+    if (isInitialLoad.current) {
+      isInitialLoad.current = false;
+      return;
+    }
+    const timeout = setTimeout(() => {
+      saveNote(paths, textboxes);
+    }, 1000);
+
+    return () => clearTimeout(timeout)
   }, [textboxes, paths, saveNote]);
 
   const stroke = getStroke(points, options);
