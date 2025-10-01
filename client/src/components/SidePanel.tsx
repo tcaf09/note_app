@@ -47,15 +47,15 @@ function SidePanel({
           />
         </div>
         <div className={`${open ? "h-auto" : "h-0"} overflow-hidden ml-4`}>
-          {folders.map((f, i) => {
-            if (f.parentId === folder._id) {
-              return <Folder folder={f} key={i} />;
+        {notes.map((note, i) => {
+            if (note.folderId === folder._id) {
+              return <p key={i} className="cursor-pointer" onClick={() => navigate(`/note/${note._id}`)}>{note.name}</p>;
             }
             return null;
           })}
-          {notes.map((note, i) => {
-            if (note.folderId === folder._id) {
-              return <p key={i} className="cursor-pointer" onClick={() => navigate(`/note/${note._id}`)}>{note.name}</p>;
+          {folders.map((f, i) => {
+            if (f.parentId === folder._id) {
+              return <Folder folder={f} key={i} />;
             }
             return null;
           })}

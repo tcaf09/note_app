@@ -65,7 +65,7 @@ function InfiniteCanvas({
 
   const saveNote = useCallback(
     async (pathsToSave: Path[], boxesToSave: Box[]) => {
-      const res = await fetch(`http://localhost:5000/api/notes/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -274,7 +274,7 @@ function InfiniteCanvas({
   useEffect(() => {
     async function loadNote() {
       try {
-        const res = await fetch(`http://localhost:5000/api/notes/${id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/${id}`, {
           method: "GET",
           headers: {
             Authorization: "Bearer " + authToken,

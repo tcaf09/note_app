@@ -101,11 +101,14 @@ function LoginSignup() {
   const [option, setOption] = useState<"login" | "signup">("login");
   async function login(username: string, password: string) {
     try {
-      const res = await fetch("http://localhost:5000/api/users/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/users/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        }
+      );
 
       const data = await res.json();
 
@@ -123,11 +126,14 @@ function LoginSignup() {
 
   async function signUp(username: string, password: string, email: string) {
     try {
-      const res = await fetch("http://localhost:5000/api/users/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password, email }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/users/register`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password, email }),
+        }
+      );
 
       if (!res.ok) throw new Error("Signup Failed");
       navigate("/dashboard");
@@ -142,14 +148,16 @@ function LoginSignup() {
         <div className="flex rounded-full bg-white justify-between w-full p-1">
           <p
             onClick={() => toggleOption("login")}
-            className={`cursor-pointer rounded-full ${option === "login" ? "bg-black text-white" : "text-black"
-              } px-10 py-2`}
+            className={`cursor-pointer rounded-full ${
+              option === "login" ? "bg-black text-white" : "text-black"
+            } px-10 py-2`}
           >
             Login
           </p>
           <p
-            className={`cursor-pointer rounded-full px-5 py-2 ${option === "signup" ? "bg-black text-white" : "text-black"
-              }`}
+            className={`cursor-pointer rounded-full px-5 py-2 ${
+              option === "signup" ? "bg-black text-white" : "text-black"
+            }`}
             onClick={() => {
               toggleOption("signup");
             }}
@@ -180,13 +188,16 @@ function LoginSignup() {
               passwordRef.current &&
               confPasswordRef.current
             ) {
-              if (passwordRef.current.value !== confPasswordRef.current.value && option === "signup") {
+              if (
+                passwordRef.current.value !== confPasswordRef.current.value &&
+                option === "signup"
+              ) {
                 setError("Passwords must match");
               } else {
                 signUp(
                   userRef.current.value,
                   passwordRef.current.value,
-                  emailRef.current.value,
+                  emailRef.current.value
                 );
               }
             }

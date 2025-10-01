@@ -32,10 +32,27 @@ function Dashboard() {
   const [deleteShown, setDeleteShown] = useState<boolean>(false);
   const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
 
+  async function getNotes() {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/`, {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + authToken,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!res.ok) throw new Error("Failed to get notes");
+      const data = await res.json();
+      setNotes(data);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   useEffect(() => {
     async function getUser() {
       try {
-        const res = await fetch("http://localhost:5000/api/users", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -52,26 +69,9 @@ function Dashboard() {
       }
     }
 
-    async function getNotes() {
-      try {
-        const res = await fetch("http://localhost:5000/api/notes/", {
-          method: "GET",
-          headers: {
-            Authorization: "Bearer " + authToken,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!res.ok) throw new Error("Failed to get notes");
-        const data = await res.json();
-        setNotes(data);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-
     async function getFolders() {
       try {
-        const res = await fetch("http://localhost:5000/api/folders/", {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/folders/`, {
           method: "GET",
           headers: {
             Authorization: "Bearer " + authToken,
@@ -103,6 +103,7 @@ function Dashboard() {
           <NewNoteMenu
             folders={folders}
             setShown={setNewNoteMenuShown}
+            loadNotes={getNotes}
             authToken={authToken || ""}
           />
         </>
@@ -116,15 +117,11 @@ function Dashboard() {
           <DeleteMenu
             note={noteToDelete || { _id: "", folderId: "", name: "" }}
             setShown={setDeleteShown}
+            loadNotes={getNotes}
             authToken={authToken || ""}
           />
         </>
       )}
-      <SidePanel
-        username={user ? user.username : "User"}
-        folders={folders}
-        notes={notes}
-      />
       <h1 className="text-white mx-auto my-20 text-center text-6xl">
         Welcome, {user && user.username}
       </h1>
@@ -153,6 +150,11 @@ function Dashboard() {
           })}
         </div>
       </div>
+      <SidePanel
+        username={user ? user.username : "User"}
+        folders={folders}
+        notes={notes}
+      />
     </div>
   );
 }

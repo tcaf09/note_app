@@ -7,15 +7,17 @@ type Note = {
 function DeleteMenu({
   note,
   setShown,
+  loadNotes,
   authToken,
 }: {
   note: Note;
   setShown: (v: boolean) => void;
+  loadNotes: () => Promise<void>
   authToken: string;
 }) {
   async function deleteNote() {
     try {
-      const res = await fetch(`http://localhost:5000/api/notes/${note._id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/${note._id}`, {
         method: "DELETE",
         headers: {
           Authorization: "Bearer " + authToken,
@@ -37,8 +39,9 @@ function DeleteMenu({
         <button
           className="grow p-2 rounded-lg text-red-600 hover:bg-red-600/20 border border-transparent hover:border-red-600 cursor-pointer"
           style={{ transition: "all 0.1s ease-in-out" }}
-          onClick={() => {
-            deleteNote();
+          onClick={async () => {
+            await deleteNote();
+            await loadNotes();
             setShown(false);
           }}
         >

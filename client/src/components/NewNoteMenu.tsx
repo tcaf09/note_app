@@ -10,10 +10,12 @@ type Folder = {
 function NewNoteMenu({
   folders,
   setShown,
+  loadNotes,
   authToken,
 }: {
   folders: Folder[];
   setShown: (v: boolean) => void;
+  loadNotes: () => Promise<void>
   authToken: string;
 }) {
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
@@ -21,7 +23,7 @@ function NewNoteMenu({
 
   async function addNote() {
     try {
-      const res = await fetch("http://localhost:5000/api/notes", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/notes`, {
         method: "POST",
         headers: {
           Authorization: "Bearer " + authToken,
@@ -80,7 +82,7 @@ function NewNoteMenu({
             className={`${isOpen ? "rotate-180" : "rotate-0"} !transition-all !duration-300 !ease-in-out my-1`}
           />
         </button>
-        <div className="bg-white rounded-md text-black absolute top-full mt-2 w-52 max-h-40 overflow-scroll">
+        <div className="bg-white rounded-md text-black absolute top-full mt-2 w-52 max-h-40 overflow-y-auto">
           {isOpen &&
             folders.map((folder) =>
               folder.parentId === null ? (
@@ -93,7 +95,7 @@ function NewNoteMenu({
   };
 
   return (
-    <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-stone-900 text-white z-50 p-5 rounded-2xl w-1/5 text-lg">
+    <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-stone-900 text-white z-50 p-10 rounded-2xl w-fit text-lg">
       <h2>Create New Note</h2>
       <div className="my-2">
         <label htmlFor="name">Name: </label>
@@ -112,9 +114,10 @@ function NewNoteMenu({
         <br />
         <br />
         <button
-          onClick={() => {
+          onClick={async () => {
+            await addNote();
+            await loadNotes();
             setShown(false);
-            addNote();
           }}
           className="bg-stone-800 rounded-full w-1/2 p-3 block mx-auto cursor-pointer"
         >
