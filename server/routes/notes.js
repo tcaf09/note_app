@@ -88,13 +88,13 @@ router.post("/", authenticateToken, async (req, res) => {
   try {
     const { name, folderId } = req.body;
 
-    if (!name || !folderId) {
+    if (!name) {
       return res
         .status(400)
         .send({ message: "Name and folder id are required" });
     }
 
-    if (!ObjectId.isValid(folderId)) {
+    if (folderId && !ObjectId.isValid(folderId)) {
       return res.status(400).send({ message: "Invalid folderId" });
     }
 

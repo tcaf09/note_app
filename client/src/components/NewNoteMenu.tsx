@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { FaAngleUp, FaRegFolder } from "react-icons/fa";
 
 type Folder = {
-  _id: string;
+  _id: string | null;
   name: string;
   parentId: string | null;
 };
@@ -15,11 +15,17 @@ function NewNoteMenu({
 }: {
   folders: Folder[];
   setShown: (v: boolean) => void;
-  loadNotes: () => Promise<void>
+  loadNotes: () => Promise<void>;
   authToken: string;
 }) {
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const nameRef = useRef<HTMLInputElement>(null);
+
+  const root: Folder = {
+    _id: null,
+    name: "Root",
+    parentId: null,
+  };
 
   async function addNote() {
     try {
@@ -79,16 +85,30 @@ function NewNoteMenu({
         >
           {selectedFolder?.name || "Select Folder..."}
           <FaAngleUp
-            className={`${isOpen ? "rotate-180" : "rotate-0"} !transition-all !duration-300 !ease-in-out my-1`}
+            className={`${
+              isOpen ? "rotate-180" : "rotate-0"
+            } !transition-all !duration-300 !ease-in-out my-1`}
           />
         </button>
         <div className="bg-white rounded-md text-black absolute top-full mt-2 w-52 max-h-40 overflow-y-auto">
-          {isOpen &&
-            folders.map((folder) =>
-              folder.parentId === null ? (
-                <FolderComponent folder={folder} key={folder._id} />
-              ) : null,
-            )}
+          {isOpen && (
+            <>
+              <div
+                style={{ paddingLeft: "16px" }}
+                onClick={() => setSelectedFolder(root)}
+                className="p-2 cursor-pointer rounded-md hover:bg-stone-200 flex flex-row"
+              >
+                <FaRegFolder className="mt-1 mr-2" />
+                <p>Root</p>
+              </div>
+
+              {folders.map((folder) =>
+                folder.parentId === null ? (
+                  <FolderComponent folder={folder} key={folder._id} />
+                ) : null
+              )}
+            </>
+          )}
         </div>
       </div>
     );
