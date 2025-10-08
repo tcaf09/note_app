@@ -28,8 +28,11 @@ function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [notes, setNotes] = useState<Note[]>([]);
   const [folders, setFolders] = useState<Folder[]>([]);
+
+  const [menuType, setMenuType] = useState<"Note" | "Folder">("Note");
   const [newNoteMenuShown, setNewNoteMenuShown] = useState<boolean>(false);
   const [deleteShown, setDeleteShown] = useState<boolean>(false);
+
   const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
 
   async function getNotes() {
@@ -44,6 +47,24 @@ function Dashboard() {
       if (!res.ok) throw new Error("Failed to get notes");
       const data = await res.json();
       setNotes(data);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async function getFolders() {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/folders/`, {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + authToken,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to get Folers");
+      const data = await res.json();
+      setFolders(data);
     } catch (err) {
       console.log(err);
     }
@@ -69,24 +90,6 @@ function Dashboard() {
       }
     }
 
-    async function getFolders() {
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/folders/`, {
-          method: "GET",
-          headers: {
-            Authorization: "Bearer " + authToken,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!res.ok) throw new Error("Failed to get Folers");
-        const data = await res.json();
-        setFolders(data);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-
     getFolders();
     getNotes();
     getUser();
@@ -104,7 +107,9 @@ function Dashboard() {
             folders={folders}
             setShown={setNewNoteMenuShown}
             loadNotes={getNotes}
+            loadFolders={getFolders}
             authToken={authToken || ""}
+            type={menuType}
           />
         </>
       )}
@@ -154,6 +159,8 @@ function Dashboard() {
         username={user ? user.username : "User"}
         folders={folders}
         notes={notes}
+        setNewNoteMenuShown={setNewNoteMenuShown}
+        setMenuType={setMenuType}
       />
     </div>
   );

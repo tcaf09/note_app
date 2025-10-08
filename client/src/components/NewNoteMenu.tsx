@@ -11,12 +11,16 @@ function NewNoteMenu({
   folders,
   setShown,
   loadNotes,
+  loadFolders,
   authToken,
+  type,
 }: {
   folders: Folder[];
   setShown: (v: boolean) => void;
   loadNotes: () => Promise<void>;
+  loadFolders: () => Promise<void>;
   authToken: string;
+  type: "Note" | "Folder";
 }) {
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const nameRef = useRef<HTMLInputElement>(null);
@@ -42,6 +46,26 @@ function NewNoteMenu({
       });
 
       if (!res.ok) throw new Error("Error adding note");
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async function addFolder() {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/folders`, {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + authToken,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: nameRef.current?.value,
+          parentId: selectedFolder?._id,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Error adding folder");
     } catch (err) {
       console.log(err);
     }
@@ -116,9 +140,9 @@ function NewNoteMenu({
 
   return (
     <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-stone-900 text-white z-50 p-10 rounded-2xl w-fit text-lg">
-      <h2>Create New Note</h2>
+      <h2>{`Create New ${type}`}</h2>
       <div className="my-2">
-        <label htmlFor="name">Name: </label>
+        <label htmlFor="name">{`${type} name: `}</label>
         <br />
         <input
           type="text"
@@ -128,16 +152,22 @@ function NewNoteMenu({
         />
         <br />
         <br />
-        <label htmlFor="folder">Folder:</label>
+        <label htmlFor="folder">Parent Folder:</label>
         <br />
         <Dropdown />
         <br />
         <br />
         <button
           onClick={async () => {
-            await addNote();
-            await loadNotes();
-            setShown(false);
+            if (type === "Note") {
+              await addNote();
+              await loadNotes();
+              setShown(false);
+            } else if (type === "Folder") {
+              await addFolder();
+              await loadFolders();
+              setShown(false);
+            }
           }}
           className="bg-stone-800 rounded-full w-1/2 p-3 block mx-auto cursor-pointer"
         >

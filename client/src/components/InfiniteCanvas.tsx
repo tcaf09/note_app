@@ -51,32 +51,53 @@ function InfiniteCanvas({
   const contextRef = useRef<HTMLDivElement>(null);
   const [contextPos, setContextPos] = useState<Pos | null>(null);
   const [contextTargetIndex, setContextTargetIndex] = useState<string | null>(
-    null,
+    null
   );
 
   const isPanning = useRef<boolean>(false);
   const panOffset = useRef<Pos>({ x: 0, y: 0 });
 
   const [textboxes, setTextboxes] = useState<Box[]>([]);
+  const [boxesToSave, setBoxesToSave] = useState<Box[]>([]);
+  const [boxesToDelete, setBoxesToDelete] = useState<Box[]>([]);
 
   const [points, setPoints] = useState<[number, number, number][]>([]);
   const [paths, setPaths] = useState<Path[]>([]);
+  const [pathsToSave, setPathsToSave] = useState<Path[]>([]);
+  const [pathsToDelete, setPathsToDelete] = useState<Path[]>([]);
   const drawing = useRef<boolean>(false);
 
   const saveNote = useCallback(
-    async (pathsToSave: Path[], boxesToSave: Box[]) => {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/${id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + authToken,
-        },
-        body: JSON.stringify({ paths: pathsToSave, textboxes: boxesToSave }),
-      });
+    async (
+      pathsToSave: Path[],
+      boxesToSave: Box[],
+      boxesToDelete: Box[],
+      pathsToDelete: Path[]
+    ) => {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/notes/${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + authToken,
+          },
+          body: JSON.stringify({
+            pathsToSave,
+            boxesToSave,
+            pathsToDelete,
+            boxesToDelete,
+          }),
+        }
+      );
 
       if (!res.ok) throw new Error("Error saving note");
+      setPathsToSave([]);
+      setBoxesToSave([]);
+      setBoxesToDelete([]);
+      setPathsToDelete([]);
     },
-    [id, authToken],
+    [id, authToken]
   );
 
   function resetGestures(e?: React.PointerEvent) {
@@ -146,7 +167,7 @@ function InfiniteCanvas({
         acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
         return acc;
       },
-      ["M", ...stroke[0], "Q"],
+      ["M", ...stroke[0], "Q"]
     );
 
     d.push("Z");
@@ -194,6 +215,13 @@ function InfiniteCanvas({
       ];
       return newPaths;
     });
+    setPathsToSave((prev) => {
+      const newPaths = [
+        ...prev,
+        { path: completedPathData, colour: colour, points: points },
+      ];
+      return newPaths;
+    });
     setPoints([]);
     drawing.current = false;
   };
@@ -204,16 +232,24 @@ function InfiniteCanvas({
     const x = e.clientX - pos.x;
     const y = e.clientY - pos.y;
 
-    setPaths((prev) =>
-      prev.filter(
-        (p) =>
-          !p.points.some(([px, py]) => {
-            const dx = px - x;
-            const dy = py - y;
-            return Math.sqrt(dx * dx + dy * dy) < 20; // 20px eraser radius
-          }),
-      ),
-    );
+    const deletedPaths: Path[] = [];
+    const remainingPaths: Path[] = [];
+
+    paths.forEach((p) => {
+      const isHit = p.points.some(([px, py]) => {
+        const dx = px - x;
+        const dy = py - y;
+        return Math.sqrt(dx * dx + dy * dy) < 20; // 20px eraser radius
+      });
+      if (isHit) {
+        deletedPaths.push(p);
+      } else {
+        remainingPaths.push(p);
+      }
+    });
+
+    setPaths(remainingPaths);
+    setPathsToDelete((prev) => [...prev, ...deletedPaths]);
   }
 
   const handleContextMenu = (e: React.MouseEvent, index: string) => {
@@ -226,6 +262,14 @@ function InfiniteCanvas({
   const deleteTextbox = () => {
     if (contextTargetIndex !== null) {
       setTextboxes((prev) => prev.filter((b) => b.id !== contextTargetIndex));
+      setBoxesToDelete((prev) => {
+        const box = textboxes.find((b) => b.id);
+        if (box) {
+          return [...prev, box];
+        } else {
+          return prev;
+        }
+      });
       setContextPos(null);
       setContextTargetIndex(null);
     }
@@ -234,26 +278,38 @@ function InfiniteCanvas({
   const addTextbox = (e: React.MouseEvent) => {
     const posx = e.clientX - 50;
     const posy = e.clientY - 50;
+    const id = uuid();
+    const newBox: Box = {
+      id,
+      x: posx - pos.x,
+      y: posy - pos.y,
+      width: 100,
+      height: "auto",
+      content: { type: "doc", content: [] },
+    };
 
-    setTextboxes((prev) => [
-      ...prev,
-      {
-        id: uuid(),
-        x: posx - pos.x,
-        y: posy - pos.y,
-        width: 100,
-        height: "auto",
-        content: { type: "doc", content: [] },
-      },
-    ]);
-
+    setTextboxes((prev) => [...prev, newBox]);
+    setBoxesToSave((prev) => [...prev, newBox]);
     setSelectedOption("mouse");
   };
 
   function updateBoxContent(id: string, content: JSONContent) {
     setTextboxes((prev) =>
-      prev.map((box) => (box.id === id ? { ...box, content: content } : box)),
+      prev.map((box) => (box.id === id ? { ...box, content: content } : box))
     );
+    setBoxesToSave((prev) => {
+      const exists = prev.find((b) => b.id === id);
+      if (exists) {
+        return prev.map((box) =>
+          box.id === id ? { ...box, content: content } : box
+        );
+      } else {
+        const fullBox = textboxes.find((b) => b.id === id);
+        if (!fullBox) return prev;
+
+        return [...prev, { ...fullBox, content }];
+      }
+    });
   }
 
   useEffect(() => {
@@ -274,13 +330,16 @@ function InfiniteCanvas({
   useEffect(() => {
     async function loadNote() {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/${id}`, {
-          method: "GET",
-          headers: {
-            Authorization: "Bearer " + authToken,
-            "Content-Type": "application/json",
-          },
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/notes/${id}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: "Bearer " + authToken,
+              "Content-Type": "application/json",
+            },
+          }
+        );
         if (!res.ok) throw new Error("Error loading note");
 
         const data = await res.json();
@@ -299,20 +358,31 @@ function InfiniteCanvas({
       isInitialLoad.current = false;
       return;
     }
+
+    if (
+      pathsToSave.length === 0 &&
+      boxesToSave.length === 0 &&
+      boxesToDelete.length === 0 &&
+      pathsToDelete.length === 0
+    ) {
+      return;
+    }
+
     const timeout = setTimeout(() => {
-      saveNote(paths, textboxes);
+      saveNote(pathsToSave, boxesToSave, boxesToDelete, pathsToDelete);
     }, 1000);
 
-    return () => clearTimeout(timeout)
-  }, [textboxes, paths, saveNote]);
+    return () => clearTimeout(timeout);
+  }, [boxesToSave, pathsToSave, boxesToDelete, pathsToDelete, saveNote]);
 
   const stroke = getStroke(points, options);
   const pathData = getSvgPathFromStroke(stroke);
 
   return (
     <div
-      className={`${selectedOption === "text" ? "cursor-text" : ""
-        } w-screen h-screen overflow-hidden`}
+      className={`${
+        selectedOption === "text" ? "cursor-text" : ""
+      } w-screen h-screen overflow-hidden`}
     >
       <div
         className="relative"
@@ -343,9 +413,24 @@ function InfiniteCanvas({
             onResize={(id, updates) => {
               setTextboxes((prev) =>
                 prev.map((box) =>
-                  box.id === id ? { ...box, ...updates } : box,
-                ),
+                  box.id === id ? { ...box, ...updates } : box
+                )
               );
+              setBoxesToSave((prev) => {
+                const exists = prev.find((box) => box.id === id);
+                if (exists) {
+                  return prev.map((box) =>
+                    box.id === id ? { ...box, ...updates } : box
+                  );
+                } else {
+                  const existingBox = textboxes.find((box) => box.id === id);
+                  if (existingBox) {
+                    return [...prev, { ...existingBox, ...updates }];
+                  } else {
+                    return prev;
+                  }
+                }
+              });
             }}
           />
         ))}

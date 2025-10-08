@@ -26,10 +26,14 @@ function SidePanel({
   username,
   folders,
   notes,
+  setNewNoteMenuShown,
+  setMenuType,
 }: {
   username: string;
   folders: Folder[];
   notes: Note[];
+  setNewNoteMenuShown: (v: boolean) => void;
+  setMenuType: (v: "Folder" | "Note") => void;
 }) {
   const [toggled, setToggled] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -61,7 +65,13 @@ function SidePanel({
                 setShowNewMenu(true);
               }}
             />
-            {showNewMenu && <NewMiniMenu setShowNewMenu={setShowNewMenu} />}
+            {showNewMenu && (
+              <NewMiniMenu
+                setShowNewMenu={setShowNewMenu}
+                setNewNoteMenuShown={setNewNoteMenuShown}
+                setMenuType={setMenuType}
+              />
+            )}
             <FaAngleUp
               className="my-2"
               style={{

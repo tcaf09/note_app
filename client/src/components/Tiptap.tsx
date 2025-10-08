@@ -30,12 +30,12 @@ const Tiptap = ({
 }: {
   selected: boolean;
   onChange: (id: string, content: JSONContent) => void;
-  box: Box
+  box: Box;
 }) => {
   const editor = useEditor({
     editable: selected,
-    onUpdate: ({editor}) => {
-      onChange(box.id, editor.getJSON())
+    onUpdate: ({ editor }) => {
+      onChange(box.id, editor.getJSON());
     },
     extensions: [
       StarterKit,
@@ -45,14 +45,22 @@ const Tiptap = ({
     ], // define your extension array
     editorProps: {
       attributes: {
-        class: `prose prose-invert text-white ${selected ? "pointer-events-auto select-text" : "pointer-events-none select-none"} break-words focus:outline-none`,
+        class: `prose prose-invert text-white ${
+          selected
+            ? "pointer-events-auto select-text"
+            : "pointer-events-none select-none"
+        } break-words focus:outline-none`,
       },
     },
   });
 
   useEffect(() => {
-    editor.commands.setContent(box.content)
-  }, [editor, box])
+    if (!editor) return;
+    const currentJSON = editor.getJSON();
+    if (JSON.stringify(currentJSON) !== JSON.stringify(box.content)) {
+      editor.commands.setContent(box.content);
+    }
+  }, [editor, box.content]);
 
   useEffect(() => {
     if (editor) {

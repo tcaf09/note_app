@@ -67,17 +67,55 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
   try {
     const query = { _id: new ObjectId(noteId), user: req.user.username };
-    const updates = {
-      $set: {
-        paths: req.body.paths,
-        textboxes: req.body.textboxes,
+    const collection = db.collection("Notes");
+    const note = await collection.findOne(query);
+    const boxesToAdd = [];
+    const boxesToChange = [];
+    for (const textbox of req.body.boxesToSave) {
+      const boxExists = note.textboxes.find((box) => box.id === textbox.id);
+      if (boxExists) {
+        boxesToChange.push(textbox);
+      } else {
+        boxesToAdd.push(textbox);
+      }
+    }
+
+    const pushUpdates = {
+      $push: {
+        paths: { $each: req.body.pathsToSave },
       },
     };
 
-    const collection = db.collection("Notes");
-    const result = await collection.updateOne(query, updates);
+    if (boxesToAdd.length > 0) {
+      pushUpdates.$push.textboxes = { $each: boxesToAdd };
+    }
 
-    res.status(200).send(result);
+    for (const box of boxesToChange) {
+      await collection.updateOne(
+        { ...query },
+        {
+          $set: {
+            "textboxes.$[elem]": box,
+          },
+        },
+        {
+          arrayFilters: [{ "elem.id": box.id }],
+        }
+      );
+    }
+
+    const boxIdsToDelete = req.body.boxesToDelete.map((b) => b.id);
+    const pullUpdates = {
+      $pull: {
+        textboxes: { id: { $in: boxIdsToDelete } },
+        paths: { $in: req.body.pathsToDelete },
+      },
+    };
+
+    const pushResults = await collection.updateOne(query, pushUpdates);
+    const pullResults = await collection.updateOne(query, pullUpdates);
+
+    res.status(200).send(pushResults, pullResults);
   } catch (err) {
     console.log(err);
     res.status(500).send({ message: "Server error" });
