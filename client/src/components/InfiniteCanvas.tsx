@@ -331,7 +331,7 @@ function InfiniteCanvas({
   };
 
   function updateBoxContent(id: string, content: JSONContent) {
-    if (isLoading) return;
+    if (isLoading.current) return;
     setTextboxes((prev) =>
       prev.map((box) => (box.id === id ? { ...box, content: content } : box))
     );
@@ -450,7 +450,7 @@ function InfiniteCanvas({
             handleContextMenu={(e) => handleContextMenu(e, box.id)}
             onChange={updateBoxContent}
             onResize={(id, updates) => {
-              if (isLoading) return;
+              if (isLoading.current) return;
               setTextboxes((prev) =>
                 prev.map((box) =>
                   box.id === id ? { ...box, ...updates } : box
