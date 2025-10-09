@@ -43,7 +43,7 @@ function InfiniteCanvas({
 }: Props) {
   const authToken = localStorage.getItem("token");
   const { id } = useParams<{ id: string }>();
-  const isInitialLoad = useRef<boolean>(true);
+  const isLoading = useRef<boolean>(true);
 
   const [pos, setPos] = useState<Pos>({ x: 0, y: 0 });
   const [scale, setScale] = useState<number>(1);
@@ -56,6 +56,11 @@ function InfiniteCanvas({
 
   const isPanning = useRef<boolean>(false);
   const panOffset = useRef<Pos>({ x: 0, y: 0 });
+  const activePointers = useRef<{
+    pointers: { [id: number]: PointerEvent };
+    initialDistance?: number;
+    initialScale?: number;
+  }>({ pointers: {} });
 
   const [textboxes, setTextboxes] = useState<Box[]>([]);
   const [boxesToSave, setBoxesToSave] = useState<Box[]>([]);
@@ -121,35 +126,67 @@ function InfiniteCanvas({
 
   const startPan = (e: React.PointerEvent) => {
     e.stopPropagation();
+    const nativeEvent = e.nativeEvent as PointerEvent;
+    activePointers.current.pointers[nativeEvent.pointerId] = nativeEvent;
+    (e.target as HTMLElement).setPointerCapture(nativeEvent.pointerId);
 
+    if (Object.keys(activePointers.current.pointers).length === 1) {
+      panOffset.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
+    } else if (Object.keys(activePointers.current.pointers).length === 2) {
+      const [p1, p2] = Object.values(activePointers.current.pointers);
+      const initialDistance = Math.hypot(
+        p2.clientX - p1.clientX,
+        p2.clientY - p1.clientY
+      );
+      activePointers.current.initialDistance = initialDistance;
+      activePointers.current.initialScale = scale;
+    }
+
+    isPanning.current = true;
     window.addEventListener("pointermove", pan);
     window.addEventListener("pointerup", stopPan);
-
-    panOffset.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
-    isPanning.current = true;
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
   };
 
   const pan = (e: PointerEvent) => {
     if (!isPanning.current || drawing.current) return;
+    activePointers.current.pointers[e.pointerId] = e;
     e.stopPropagation();
 
-    const newX = e.clientX - panOffset.current.x;
-    const newY = e.clientY - panOffset.current.y;
+    if (Object.keys(activePointers.current.pointers).length === 1) {
+      const newX = e.clientX - panOffset.current.x;
+      const newY = e.clientY - panOffset.current.y;
 
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    const canvasWidth = 5000;
-    const canvasHeight = 5000;
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const canvasWidth = 5000;
+      const canvasHeight = 5000;
 
-    const clampedX = Math.min(0, Math.max(newX, viewportWidth - canvasWidth));
-    const clampedY = Math.min(0, Math.max(newY, viewportHeight - canvasHeight));
+      const clampedX = Math.min(0, Math.max(newX, viewportWidth - canvasWidth));
+      const clampedY = Math.min(
+        0,
+        Math.max(newY, viewportHeight - canvasHeight)
+      );
 
-    setPos({ x: clampedX, y: clampedY });
+      setPos({ x: clampedX, y: clampedY });
+    } else if (Object.keys(activePointers.current.pointers).length === 2) {
+      const [p1, p2] = Object.values(activePointers.current.pointers);
+      const currentDistance = Math.hypot(
+        p2.clientX - p1.clientX,
+        p2.clientY - p1.clientY
+      );
+      const scaleFactor =
+        currentDistance / (activePointers.current.initialDistance || 1);
+      setScale((activePointers.current.initialScale || 1) * scaleFactor);
+    }
   };
 
-  const stopPan = (e?: PointerEvent) => {
+  const stopPan = (e: PointerEvent) => {
+    delete activePointers.current.pointers[e.pointerId];
     isPanning.current = false;
+    if (Object.keys(activePointers.current.pointers).length < 2) {
+      delete activePointers.current.initialDistance;
+      delete activePointers.current.initialScale;
+    }
     window.removeEventListener("pointermove", pan);
     window.removeEventListener("pointerup", stopPan);
 
@@ -263,7 +300,7 @@ function InfiniteCanvas({
     if (contextTargetIndex !== null) {
       setTextboxes((prev) => prev.filter((b) => b.id !== contextTargetIndex));
       setBoxesToDelete((prev) => {
-        const box = textboxes.find((b) => b.id);
+        const box = textboxes.find((b) => b.id === contextTargetIndex);
         if (box) {
           return [...prev, box];
         } else {
@@ -294,6 +331,7 @@ function InfiniteCanvas({
   };
 
   function updateBoxContent(id: string, content: JSONContent) {
+    if (isLoading) return;
     setTextboxes((prev) =>
       prev.map((box) => (box.id === id ? { ...box, content: content } : box))
     );
@@ -347,6 +385,8 @@ function InfiniteCanvas({
         setTextboxes(data.textboxes);
       } catch (err) {
         console.log(err);
+      } finally {
+        isLoading.current = false;
       }
     }
 
@@ -354,8 +394,7 @@ function InfiniteCanvas({
   }, [id, authToken]);
 
   useEffect(() => {
-    if (isInitialLoad.current) {
-      isInitialLoad.current = false;
+    if (isLoading.current) {
       return;
     }
 
@@ -411,6 +450,7 @@ function InfiniteCanvas({
             handleContextMenu={(e) => handleContextMenu(e, box.id)}
             onChange={updateBoxContent}
             onResize={(id, updates) => {
+              if (isLoading) return;
               setTextboxes((prev) =>
                 prev.map((box) =>
                   box.id === id ? { ...box, ...updates } : box

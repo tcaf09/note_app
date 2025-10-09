@@ -6,6 +6,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { FaBold, FaUnderline, FaItalic } from "react-icons/fa";
 import { useEffect } from "react";
 import Heading from "@tiptap/extension-heading";
+import { BulletList, ListItem } from "@tiptap/extension-list";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,10 +39,14 @@ const Tiptap = ({
       onChange(box.id, editor.getJSON());
     },
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        heading: false,
+      }),
       Heading.configure({
         levels: [1, 2, 3],
       }),
+      BulletList,
+      ListItem,
     ], // define your extension array
     editorProps: {
       attributes: {

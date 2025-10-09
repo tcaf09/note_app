@@ -1,4 +1,5 @@
 import DeleteMenu from "@/components/DeleteMenu";
+import NewMiniMenu from "@/components/NewMiniMenu";
 import NewNoteMenu from "@/components/NewNoteMenu";
 import NoteCard from "@/components/NoteCard";
 import SidePanel from "@/components/SidePanel";
@@ -31,7 +32,10 @@ function Dashboard() {
 
   const [menuType, setMenuType] = useState<"Note" | "Folder">("Note");
   const [newNoteMenuShown, setNewNoteMenuShown] = useState<boolean>(false);
+  const [miniMenuShown, setMiniMenuShown] = useState<boolean>(false);
   const [deleteShown, setDeleteShown] = useState<boolean>(false);
+
+  const [parentFolder, setParentFolder] = useState<Folder | null>(null);
 
   const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
 
@@ -110,6 +114,8 @@ function Dashboard() {
             loadFolders={getFolders}
             authToken={authToken || ""}
             type={menuType}
+            setType={setMenuType}
+            parentFolder={parentFolder}
           />
         </>
       )}
@@ -133,7 +139,10 @@ function Dashboard() {
       <div className="w-2/3 p-10 mx-auto rounded-3xl bg-black relative">
         <button
           className="bg-stone-800 text-white p-3 rounded-md absolute right-4 top-4 cursor-pointer"
-          onClick={() => setNewNoteMenuShown(true)}
+          onClick={() => {
+            setParentFolder(null);
+            setNewNoteMenuShown(true);
+          }}
         >
           <FaPlus />
         </button>
@@ -161,6 +170,7 @@ function Dashboard() {
         notes={notes}
         setNewNoteMenuShown={setNewNoteMenuShown}
         setMenuType={setMenuType}
+        setParentFolder={setParentFolder}
       />
     </div>
   );

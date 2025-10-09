@@ -28,12 +28,14 @@ function SidePanel({
   notes,
   setNewNoteMenuShown,
   setMenuType,
+  setParentFolder,
 }: {
   username: string;
   folders: Folder[];
   notes: Note[];
   setNewNoteMenuShown: (v: boolean) => void;
   setMenuType: (v: "Folder" | "Note") => void;
+  setParentFolder: (v: Folder | null) => void;
 }) {
   const [toggled, setToggled] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -62,6 +64,7 @@ function SidePanel({
               }`}
               onClick={(e) => {
                 e.stopPropagation();
+                setParentFolder(folder);
                 setShowNewMenu(true);
               }}
             />

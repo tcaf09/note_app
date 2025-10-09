@@ -14,6 +14,8 @@ function NewNoteMenu({
   loadFolders,
   authToken,
   type,
+  setType,
+  parentFolder,
 }: {
   folders: Folder[];
   setShown: (v: boolean) => void;
@@ -21,8 +23,12 @@ function NewNoteMenu({
   loadFolders: () => Promise<void>;
   authToken: string;
   type: "Note" | "Folder";
+  setType: (v: "Note" | "Folder") => void;
+  parentFolder: Folder | null;
 }) {
-  const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
+  const [selectedFolder, setSelectedFolder] = useState<Folder | null>(
+    parentFolder
+  );
   const nameRef = useRef<HTMLInputElement>(null);
 
   const root: Folder = {
@@ -140,7 +146,29 @@ function NewNoteMenu({
 
   return (
     <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-stone-900 text-white z-50 p-10 rounded-2xl w-fit text-lg">
-      <h2>{`Create New ${type}`}</h2>
+      {!parentFolder && (
+        <div className="flex rounded-full bg-white justify-between w-full p-1">
+          <p
+            onClick={() => setType("Note")}
+            className={`cursor-pointer rounded-full ${
+              type === "Note" ? "bg-black text-white" : "text-black"
+            } px-10 py-2`}
+          >
+            Note
+          </p>
+          <p
+            className={`cursor-pointer rounded-full px-5 py-2 ${
+              type === "Folder" ? "bg-black text-white" : "text-black"
+            }`}
+            onClick={() => {
+              setType("Folder");
+            }}
+          >
+            Folder
+          </p>
+        </div>
+      )}
+      {parentFolder && <h2>{`Create New ${type}`}</h2>}
       <div className="my-2">
         <label htmlFor="name">{`${type} name: `}</label>
         <br />
@@ -152,11 +180,15 @@ function NewNoteMenu({
         />
         <br />
         <br />
-        <label htmlFor="folder">Parent Folder:</label>
-        <br />
-        <Dropdown />
-        <br />
-        <br />
+        {!parentFolder && (
+          <>
+            <label htmlFor="folder">Parent Folder:</label>
+            <br />
+            <Dropdown />
+            <br />
+            <br />
+          </>
+        )}
         <button
           onClick={async () => {
             if (type === "Note") {
