@@ -176,19 +176,23 @@ function InfiniteCanvas({
       );
       const scaleFactor =
         currentDistance / (activePointers.current.initialDistance || 1);
-      setScale((activePointers.current.initialScale || 1) * scaleFactor);
+      const dampingFactor = 0.6;
+      const dampedScaleFactor = 1 + (scaleFactor - 1) * dampingFactor;
+      setScale((activePointers.current.initialScale || 1) * dampedScaleFactor);
     }
   };
 
   const stopPan = (e: PointerEvent) => {
     delete activePointers.current.pointers[e.pointerId];
-    isPanning.current = false;
+    if (Object.keys(activePointers.current.pointers).length === 0) {
+      isPanning.current = false;
+      window.removeEventListener("pointermove", pan);
+      window.removeEventListener("pointerup", stopPan);
+    }
     if (Object.keys(activePointers.current.pointers).length < 2) {
       delete activePointers.current.initialDistance;
       delete activePointers.current.initialScale;
     }
-    window.removeEventListener("pointermove", pan);
-    window.removeEventListener("pointerup", stopPan);
 
     if (e) {
       (e.target as HTMLElement).releasePointerCapture(e.pointerId);
@@ -230,7 +234,9 @@ function InfiniteCanvas({
   function handlePointerDown(e: React.PointerEvent) {
     if (e.buttons !== 1 || e.pointerType === "touch") return;
     (e.target as Element).setPointerCapture(e.pointerId);
-    setPoints([[e.clientX - pos.x, e.clientY - pos.y, e.pressure]]);
+    setPoints([
+      [(e.clientX - pos.x) / scale, (e.clientY - pos.y) / scale, e.pressure],
+    ]);
     drawing.current = true;
   }
 
@@ -238,7 +244,7 @@ function InfiniteCanvas({
     if (e.buttons !== 1 || e.pointerType === "touch") return;
     setPoints((prev) => [
       ...prev,
-      [e.clientX - pos.x, e.clientY - pos.y, e.pressure],
+      [(e.clientX - pos.x) / scale, (e.clientY - pos.y) / scale, e.pressure],
     ]);
   }
 
@@ -266,8 +272,8 @@ function InfiniteCanvas({
   function handleEraserMove(e: React.PointerEvent) {
     if (e.buttons !== 1) return;
 
-    const x = e.clientX - pos.x;
-    const y = e.clientY - pos.y;
+    const x = (e.clientX - pos.x) / scale;
+    const y = (e.clientY - pos.y) / scale;
 
     const deletedPaths: Path[] = [];
     const remainingPaths: Path[] = [];
@@ -292,7 +298,10 @@ function InfiniteCanvas({
   const handleContextMenu = (e: React.MouseEvent, index: string) => {
     e.stopPropagation();
     e.preventDefault();
-    setContextPos({ x: e.clientX - pos.x, y: e.clientY - pos.y });
+    setContextPos({
+      x: (e.clientX - pos.x) / scale,
+      y: (e.clientY - pos.y) / scale,
+    });
     setContextTargetIndex(index);
   };
 
@@ -313,8 +322,8 @@ function InfiniteCanvas({
   };
 
   const addTextbox = (e: React.MouseEvent) => {
-    const posx = e.clientX - 50;
-    const posy = e.clientY - 50;
+    const posx = (e.clientX - 50) / scale;
+    const posy = (e.clientY - 50) / scale;
     const id = uuid();
     const newBox: Box = {
       id,
@@ -429,7 +438,7 @@ function InfiniteCanvas({
           width: 5000,
           height: 5000,
           transform: `translate(${pos.x}px, ${pos.y}px) scale(${scale})`,
-          transformOrigin: "0, 0",
+          transformOrigin: "top left",
           touchAction: "none",
         }}
         onClick={(e) => {
@@ -510,7 +519,7 @@ function InfiniteCanvas({
             resetGestures(e);
           }}
           style={{
-            position: "fixed",
+            position: "absolute",
             top: 0,
             left: 0,
             width: "100%",
