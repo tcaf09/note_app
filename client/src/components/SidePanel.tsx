@@ -5,6 +5,7 @@ import {
   FaRegFolder,
   FaRegStickyNote,
   FaPlus,
+  FaRegTrashAlt,
 } from "react-icons/fa";
 import { MdMenu } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -43,6 +44,7 @@ function SidePanel({
   function Folder({ folder }: { folder: Folder }) {
     const [open, setOpen] = useState<boolean>(true);
     const [hover, setHover] = useState<boolean>(false);
+    const [noteHover, setNoteHover] = useState<boolean>(false);
     const [showNewMenu, setShowNewMenu] = useState<boolean>(false);
 
     return (
@@ -54,10 +56,13 @@ function SidePanel({
           onMouseLeave={() => setHover(false)}
         >
           <div className="flex gap-2">
+            <FaRegTrashAlt
+              className={`my-1  ${hover ? "text-red-500" : "text-transparent"}`}
+            />
             <FaRegFolder className="my-1" />
             <p>{folder.name}</p>
           </div>
-          <div className="flex relative gap-4">
+          <div className="flex relative gap-2">
             <FaPlus
               className={`my-2  ${
                 hover ? "text-stone-400" : "text-transparent"
@@ -95,7 +100,14 @@ function SidePanel({
                 <div
                   className="flex gap-2 cursor-pointer my-1"
                   onClick={() => navigate(`/note/${note._id}`)}
+                  onMouseEnter={() => setNoteHover(true)}
+                  onMouseLeave={() => setNoteHover(false)}
                 >
+                  <FaRegTrashAlt
+                    className={`my-1  ${
+                      noteHover ? "text-red-500" : "text-transparent"
+                    }`}
+                  />
                   <FaRegStickyNote className="my-1" />
                   <p key={i} className="cursor-pointer">
                     {note.name}
