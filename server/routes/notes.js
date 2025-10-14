@@ -135,6 +135,10 @@ router.post("/", authenticateToken, async (req, res) => {
     if (folderId && !ObjectId.isValid(folderId)) {
       return res.status(400).send({ message: "Invalid folderId" });
     }
+    let folderObjectId = null;
+    if (folderId) {
+      folderObjectId = new ObjectId(folderId);
+    }
 
     const collection = db.collection("Notes");
 
@@ -143,7 +147,7 @@ router.post("/", authenticateToken, async (req, res) => {
       name: name,
       paths: [],
       textboxes: [],
-      folderId: folderId,
+      folderId: folderObjectId,
     });
 
     res.status(200).send(results);

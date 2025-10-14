@@ -85,7 +85,7 @@ function InfiniteCanvas({
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + authToken,
+            "Authorization": "Bearer " + authToken,
           },
           body: JSON.stringify({
             pathsToSave,
@@ -382,7 +382,7 @@ function InfiniteCanvas({
           {
             method: "GET",
             headers: {
-              Authorization: "Bearer " + authToken,
+              "Authorization": "Bearer " + authToken,
               "Content-Type": "application/json",
             },
           }
@@ -418,7 +418,7 @@ function InfiniteCanvas({
 
     const timeout = setTimeout(() => {
       saveNote(pathsToSave, boxesToSave, boxesToDelete, pathsToDelete);
-    }, 1000);
+    }, 5000);
 
     return () => clearTimeout(timeout);
   }, [boxesToSave, pathsToSave, boxesToDelete, pathsToDelete, saveNote]);

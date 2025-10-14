@@ -29,6 +29,9 @@ function SidePanel({
   notes,
   setNewNoteMenuShown,
   setMenuType,
+  setDeleteType,
+  setToDelete,
+  setDeleteMenuShown,
   setParentFolder,
 }: {
   username: string;
@@ -36,6 +39,9 @@ function SidePanel({
   notes: Note[];
   setNewNoteMenuShown: (v: boolean) => void;
   setMenuType: (v: "Folder" | "Note") => void;
+  setDeleteType: (v: "note" | "folder") => void;
+  setToDelete: (v: Note | Folder) => void;
+  setDeleteMenuShown: (v: boolean) => void;
   setParentFolder: (v: Folder | null) => void;
 }) {
   const [toggled, setToggled] = useState<boolean>(false);
@@ -44,7 +50,6 @@ function SidePanel({
   function Folder({ folder }: { folder: Folder }) {
     const [open, setOpen] = useState<boolean>(true);
     const [hover, setHover] = useState<boolean>(false);
-    const [noteHover, setNoteHover] = useState<boolean>(false);
     const [showNewMenu, setShowNewMenu] = useState<boolean>(false);
 
     return (
@@ -56,23 +61,37 @@ function SidePanel({
           onMouseLeave={() => setHover(false)}
         >
           <div className="flex gap-2">
-            <FaRegTrashAlt
-              className={`my-1  ${hover ? "text-red-500" : "text-transparent"}`}
-            />
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                setDeleteType("folder");
+                setToDelete(folder);
+                setDeleteMenuShown(true);
+              }}
+            >
+              <FaRegTrashAlt
+                className={`my-1  ${
+                  hover ? "text-red-500" : "text-transparent"
+                }`}
+              />
+            </div>
             <FaRegFolder className="my-1" />
             <p>{folder.name}</p>
           </div>
           <div className="flex relative gap-2">
-            <FaPlus
-              className={`my-2  ${
-                hover ? "text-stone-400" : "text-transparent"
-              }`}
+            <div
               onClick={(e) => {
                 e.stopPropagation();
                 setParentFolder(folder);
                 setShowNewMenu(true);
               }}
-            />
+            >
+              <FaPlus
+                className={`my-2  ${
+                  hover ? "text-stone-400" : "text-transparent"
+                }`}
+              />
+            </div>
             {showNewMenu && (
               <NewMiniMenu
                 setShowNewMenu={setShowNewMenu}
@@ -96,6 +115,7 @@ function SidePanel({
         >
           {notes.map((note, i) => {
             if (note.folderId === folder._id) {
+              const [noteHover, setNoteHover] = useState<boolean>(false);
               return (
                 <div
                   className="flex gap-2 cursor-pointer my-1"
@@ -103,11 +123,20 @@ function SidePanel({
                   onMouseEnter={() => setNoteHover(true)}
                   onMouseLeave={() => setNoteHover(false)}
                 >
-                  <FaRegTrashAlt
-                    className={`my-1  ${
-                      noteHover ? "text-red-500" : "text-transparent"
-                    }`}
-                  />
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteType("note");
+                      setToDelete(note);
+                      setDeleteMenuShown(true);
+                    }}
+                  >
+                    <FaRegTrashAlt
+                      className={`my-1  ${
+                        noteHover ? "text-red-500" : "text-transparent"
+                      }`}
+                    />
+                  </div>
                   <FaRegStickyNote className="my-1" />
                   <p key={i} className="cursor-pointer">
                     {note.name}

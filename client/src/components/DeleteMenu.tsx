@@ -1,47 +1,85 @@
 type Note = {
   _id: string;
   name: string;
-  folderId: string;
+  folderId: string | null;
+};
+
+type Folder = {
+  _id: string;
+  name: string;
+  parentId: string | null;
 };
 
 function DeleteMenu({
-  note,
+  toDelete,
+  type,
   setShown,
   loadNotes,
+  loadFolders,
   authToken,
 }: {
-  note: Note;
+  toDelete: Note | Folder;
+  type: "note" | "folder";
   setShown: (v: boolean) => void;
-  loadNotes: () => Promise<void>
+  loadNotes: () => Promise<void>;
+  loadFolders: () => Promise<void>;
   authToken: string;
 }) {
   async function deleteNote() {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/${note._id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: "Bearer " + authToken,
-          "Content-Type": "application/json",
-        },
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/notes/${toDelete._id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: "Bearer " + authToken,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!res.ok) throw new Error("Error deleting note");
-
-      console.log("Note Removed");
     } catch (err) {
       console.log(err);
     }
   }
+
+  async function deleteFolder() {
+    try {
+      console.log(toDelete);
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/folders/${toDelete._id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: "Bearer " + authToken,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!res.ok) throw new Error("Error deleting note");
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   return (
     <div className="z-50 text-white fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-stone-900 rounded-2xl p-4 flex flex-col items-center">
-      <h2>Delete {note.name}?</h2>
+      <h2>Delete {toDelete.name}?</h2>
       <div className="w-full flex gap-4 my-2">
         <button
           className="grow p-2 rounded-lg text-red-600 hover:bg-red-600/20 border border-transparent hover:border-red-600 cursor-pointer"
           style={{ transition: "all 0.1s ease-in-out" }}
           onClick={async () => {
-            await deleteNote();
-            await loadNotes();
+            if (type === "note") {
+              await deleteNote();
+              await loadNotes();
+            } else if (type === "folder") {
+              await deleteFolder();
+              await loadFolders();
+              await loadNotes();
+            }
             setShown(false);
           }}
         >

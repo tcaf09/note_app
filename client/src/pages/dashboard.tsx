@@ -1,5 +1,4 @@
 import DeleteMenu from "@/components/DeleteMenu";
-import NewMiniMenu from "@/components/NewMiniMenu";
 import NewNoteMenu from "@/components/NewNoteMenu";
 import NoteCard from "@/components/NoteCard";
 import SidePanel from "@/components/SidePanel";
@@ -15,7 +14,7 @@ type User = {
 type Note = {
   _id: string;
   name: string;
-  folderId: string;
+  folderId: string | null;
 };
 
 type Folder = {
@@ -32,12 +31,15 @@ function Dashboard() {
 
   const [menuType, setMenuType] = useState<"Note" | "Folder">("Note");
   const [newNoteMenuShown, setNewNoteMenuShown] = useState<boolean>(false);
-  const [miniMenuShown, setMiniMenuShown] = useState<boolean>(false);
   const [deleteShown, setDeleteShown] = useState<boolean>(false);
+  const [toDelete, setToDelete] = useState<Note | Folder>({
+    _id: "",
+    folderId: "",
+    name: "",
+  });
+  const [deleteType, setDeleteType] = useState<"note" | "folder">("note");
 
   const [parentFolder, setParentFolder] = useState<Folder | null>(null);
-
-  const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
 
   async function getNotes() {
     try {
@@ -126,9 +128,11 @@ function Dashboard() {
             onClick={() => setNewNoteMenuShown(false)}
           ></div>
           <DeleteMenu
-            note={noteToDelete || { _id: "", folderId: "", name: "" }}
+            toDelete={toDelete}
+            type={deleteType}
             setShown={setDeleteShown}
             loadNotes={getNotes}
+            loadFolders={getFolders}
             authToken={authToken || ""}
           />
         </>
@@ -153,11 +157,14 @@ function Dashboard() {
                 note={note}
                 folder={
                   folders.find((folder) => folder._id === note.folderId) || {
+                    _id: "",
                     name: "No Folder",
+                    parentId: "",
                   }
                 }
                 setDeleteShown={setDeleteShown}
-                setNoteToDelete={setNoteToDelete}
+                setToDelete={setToDelete}
+                setDeleteType={setDeleteType}
                 key={i}
               />
             );
@@ -170,6 +177,9 @@ function Dashboard() {
         notes={notes}
         setNewNoteMenuShown={setNewNoteMenuShown}
         setMenuType={setMenuType}
+        setToDelete={setToDelete}
+        setDeleteType={setDeleteType}
+        setDeleteMenuShown={setDeleteShown}
         setParentFolder={setParentFolder}
       />
     </div>

@@ -24,13 +24,17 @@ router.get("/", authenticateToken, async (req, res) => {
 router.post("/", authenticateToken, async (req, res) => {
   try {
     const { name, parentId } = req.body;
+    let parentObjectId = null;
+    if (parentId) {
+      parentObjectId = new ObjectId(parentId);
+    }
     if (!name) {
       return res.status(400).send({ message: "Folder Name is Required" });
     }
     const collection = db.collection("Folders");
     const newFolder = {
       name,
-      parentId,
+      parentId: parentObjectId,
       user: req.user.username,
     };
     const results = await collection.insertOne(newFolder);
@@ -38,6 +42,48 @@ router.post("/", authenticateToken, async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).send({ message: "Server Error" });
+  }
+});
+
+async function deleteFolder(folderId) {
+  const folderCollection = db.collection("Folders");
+  const noteCollection = db.collection("Notes");
+
+  const folder = await folderCollection.findOne({
+    _id: new ObjectId(folderId),
+  });
+
+  if (!folder) {
+    throw new Error("Folder not found");
+  }
+
+  await noteCollection.deleteMany({ folderId: new ObjectId(folder._id) });
+
+  const childFolders = await folderCollection
+    .find({
+      parentId: new ObjectId(folder._id),
+    })
+    .toArray();
+
+  for (const child of childFolders) {
+    await deleteFolder(child._id);
+  }
+
+  await folderCollection.deleteOne({ _id: folder._id });
+}
+
+router.delete("/:id", authenticateToken, async (req, res) => {
+  const id = req.params.id;
+
+  if (!ObjectId.isValid(id)) {
+    return res.status(400).send({ message: "Invalid id" });
+  }
+  try {
+    await deleteFolder(id);
+    res.status(200).send({ message: "Folder deleted" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: "Server error" });
   }
 });
 

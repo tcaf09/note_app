@@ -5,25 +5,27 @@ import { useNavigate } from "react-router-dom";
 type Note = {
   _id: string;
   name: string;
-  folderId: string;
+  folderId: string | null;
 };
 
 type Folder = {
-  _id?: string;
+  _id: string;
   name: string;
-  parentId?: string | null;
+  parentId: string | null;
 };
 
 function NoteCard({
   note,
   folder,
   setDeleteShown,
-  setNoteToDelete,
+  setDeleteType,
+  setToDelete,
 }: {
   note: Note;
   folder: Folder;
   setDeleteShown: (v: boolean) => void;
-  setNoteToDelete: (v: Note) => void;
+  setDeleteType: (v: "note" | "folder") => void;
+  setToDelete: (v: Note | Folder) => void;
 }) {
   const navigate = useNavigate();
 
@@ -51,7 +53,8 @@ function NoteCard({
             style={{ transition: "all 0.3s ease-in-out" }}
             onClick={(e) => {
               e.stopPropagation();
-              setNoteToDelete(note);
+              setDeleteType("note");
+              setToDelete(note);
               setDeleteShown(true);
             }}
           >

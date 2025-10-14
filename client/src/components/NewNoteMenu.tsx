@@ -42,7 +42,7 @@ function NewNoteMenu({
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/notes`, {
         method: "POST",
         headers: {
-          Authorization: "Bearer " + authToken,
+          "Authorization": "Bearer " + authToken,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -62,7 +62,7 @@ function NewNoteMenu({
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/folders`, {
         method: "POST",
         headers: {
-          Authorization: "Bearer " + authToken,
+          "Authorization": "Bearer " + authToken,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
