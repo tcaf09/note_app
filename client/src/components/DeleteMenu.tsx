@@ -2,6 +2,7 @@ type Note = {
   _id: string;
   name: string;
   folderId: string | null;
+  thumbnailUrl: string;
 };
 
 type Folder = {

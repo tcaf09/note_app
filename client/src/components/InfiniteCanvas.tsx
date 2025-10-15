@@ -5,6 +5,7 @@ import { getStroke } from "perfect-freehand";
 import { useParams } from "react-router-dom";
 import { type JSONContent } from "@tiptap/react";
 import { v4 as uuid } from "uuid";
+import * as htmlToImage from "html-to-image";
 
 type Pos = {
   x: number;
@@ -44,6 +45,7 @@ function InfiniteCanvas({
   const authToken = localStorage.getItem("token");
   const { id } = useParams<{ id: string }>();
   const isLoading = useRef<boolean>(true);
+  const screenRef = useRef<HTMLDivElement>(null);
 
   const [pos, setPos] = useState<Pos>({ x: 0, y: 0 });
   const [scale, setScale] = useState<number>(1);
@@ -79,19 +81,28 @@ function InfiniteCanvas({
       boxesToDelete: Box[],
       pathsToDelete: Path[]
     ) => {
+      let thumbnailUrl = "";
+      if (screenRef.current) {
+        thumbnailUrl = await htmlToImage.toJpeg(screenRef.current, {
+          quality: 0.5,
+          backgroundColor: "#0c0a09",
+        });
+      }
+
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/api/notes/${id}`,
         {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + authToken,
+            Authorization: "Bearer " + authToken,
           },
           body: JSON.stringify({
             pathsToSave,
             boxesToSave,
             pathsToDelete,
             boxesToDelete,
+            thumbnailUrl,
           }),
         }
       );
@@ -382,7 +393,7 @@ function InfiniteCanvas({
           {
             method: "GET",
             headers: {
-              "Authorization": "Bearer " + authToken,
+              Authorization: "Bearer " + authToken,
               "Content-Type": "application/json",
             },
           }
@@ -431,6 +442,7 @@ function InfiniteCanvas({
       className={`${
         selectedOption === "text" ? "cursor-text" : ""
       } w-screen h-screen overflow-hidden`}
+      ref={screenRef}
     >
       <div
         className="relative"

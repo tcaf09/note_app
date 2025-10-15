@@ -15,6 +15,7 @@ type Note = {
   _id: string;
   name: string;
   folderId: string | null;
+  thumbnailUrl: string;
 };
 
 type Folder = {
@@ -36,6 +37,7 @@ function Dashboard() {
     _id: "",
     folderId: "",
     name: "",
+    thumbnailUrl: "",
   });
   const [deleteType, setDeleteType] = useState<"note" | "folder">("note");
 

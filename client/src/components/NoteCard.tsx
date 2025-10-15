@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { FaRegFolder, FaRegTrashAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
@@ -6,6 +5,7 @@ type Note = {
   _id: string;
   name: string;
   folderId: string | null;
+  thumbnailUrl: string;
 };
 
 type Folder = {
@@ -29,16 +29,15 @@ function NoteCard({
 }) {
   const navigate = useNavigate();
 
-  const previewRef = useRef<HTMLDivElement>(null);
   return (
     <div
       className="bg-stone-950 w-52 rounded-xl shadow-md"
       onClick={() => navigate(`/note/${note._id}`)}
     >
-      <div
-        ref={previewRef}
-        className="h-40 text-white flex items-center justify-center cursor-pointer"
-      ></div>
+      <img
+        src={note.thumbnailUrl}
+        className="h-40 text-white flex items-center justify-center cursor-pointer object-cover rounded-t-xl"
+      />
       <div className="bg-stone-900 p-2 rounded-b-xl flex justify-between">
         <div>
           <p className="text-white text-xl">{note.name}</p>

@@ -15,6 +15,7 @@ type Note = {
   _id: string;
   name: string;
   folderId: string | null;
+  thumbnailUrl: string;
 };
 
 type Folder = {
@@ -48,7 +49,7 @@ function SidePanel({
   const navigate = useNavigate();
 
   function Folder({ folder }: { folder: Folder }) {
-    const [open, setOpen] = useState<boolean>(true);
+    const [open, setOpen] = useState<boolean>(false);
     const [hover, setHover] = useState<boolean>(false);
     const [showNewMenu, setShowNewMenu] = useState<boolean>(false);
 

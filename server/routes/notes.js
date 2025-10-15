@@ -112,10 +112,17 @@ router.patch("/:id", authenticateToken, async (req, res) => {
       },
     };
 
+    const setUpdates = {
+      $set: {
+        thumbnailUrl: req.body.thumbnailUrl,
+      },
+    };
+
     const pushResults = await collection.updateOne(query, pushUpdates);
     const pullResults = await collection.updateOne(query, pullUpdates);
+    const setResults = await collection.updateOne(query, setUpdates);
 
-    res.status(200).send(pushResults, pullResults);
+    res.status(200).send(pushResults, pullResults, setResults);
   } catch (err) {
     console.log(err);
     res.status(500).send({ message: "Server error" });
@@ -148,6 +155,7 @@ router.post("/", authenticateToken, async (req, res) => {
       paths: [],
       textboxes: [],
       folderId: folderObjectId,
+      thumbnailUrl: "",
     });
 
     res.status(200).send(results);
