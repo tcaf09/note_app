@@ -227,7 +227,7 @@ function InfiniteCanvas({
   };
 
   const options = {
-    size: penSizes[colours.indexOf(colour)] * 4,
+    size: penSizes[colours.indexOf(colour)] * 2,
     smoothing: 0.54,
     thinning: 0.11,
     streamline: 0.5,

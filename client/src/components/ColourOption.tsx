@@ -71,7 +71,7 @@ function ColourOption({
         <input
           type="range"
           min={1}
-          max={4}
+          max={8}
           value={penSizes[index]}
           onChange={(e) =>
             setPenSizes((prev) => {
