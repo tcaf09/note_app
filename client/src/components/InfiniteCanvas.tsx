@@ -228,9 +228,9 @@ function InfiniteCanvas({
 
   const options = {
     size: penSizes[colours.indexOf(colour)] * 2,
-    smoothing: 0.54,
+    smoothing: penSizes[colours.indexOf(colour)] / 32,
     thinning: 0.11,
-    streamline: 0.5,
+    streamline: 0.01,
     easing: (t: number) => t,
     start: {
       taper: 0,

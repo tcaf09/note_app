@@ -2,7 +2,7 @@ import DeleteMenu from "@/components/DeleteMenu";
 import NewNoteMenu from "@/components/NewNoteMenu";
 import NoteCard from "@/components/NoteCard";
 import SidePanel from "@/components/SidePanel";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 
 type User = {
@@ -42,8 +42,7 @@ function Dashboard() {
   const [deleteType, setDeleteType] = useState<"note" | "folder">("note");
 
   const [parentFolder, setParentFolder] = useState<Folder | null>(null);
-
-  async function getNotes() {
+  const getNotes = useCallback(async () => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/`, {
         method: "GET",
@@ -58,9 +57,9 @@ function Dashboard() {
     } catch (err) {
       console.log(err);
     }
-  }
-
-  async function getFolders() {
+  }, [authToken])
+  
+  const getFolders = useCallback(async () => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/folders/`, {
         method: "GET",
@@ -76,7 +75,7 @@ function Dashboard() {
     } catch (err) {
       console.log(err);
     }
-  }
+  }, [authToken])
 
   useEffect(() => {
     async function getUser() {
@@ -101,7 +100,7 @@ function Dashboard() {
     getFolders();
     getNotes();
     getUser();
-  }, [authToken]);
+  }, [authToken, getFolders, getNotes]);
 
   return (
     <div className="w-full h-full">
@@ -142,7 +141,7 @@ function Dashboard() {
       <h1 className="text-white mx-auto my-20 text-center text-6xl">
         Welcome, {user && user.username}
       </h1>
-      <div className="w-2/3 p-10 mx-auto rounded-3xl bg-black relative">
+      <div className="w-2/3 p-10 mx-auto rounded-3xl bg-black relative shadow-xl shadow-black">
         <button
           className="bg-stone-800 text-white p-3 rounded-md absolute right-4 top-4 cursor-pointer"
           onClick={() => {

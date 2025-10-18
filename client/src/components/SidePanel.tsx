@@ -24,6 +24,48 @@ type Folder = {
   parentId: string | null;
 };
 
+function NoteItem({
+  setDeleteType,
+  setToDelete,
+  setDeleteMenuShown,
+  note,
+  i,
+}: {
+  setDeleteType: (v: "note" | "folder") => void;
+  setToDelete: (v: Note | Folder) => void;
+  setDeleteMenuShown: (v: boolean) => void;
+  note: Note;
+  i: number;
+}) {
+  const navigate = useNavigate();
+  const [noteHover, setNoteHover] = useState<boolean>(false);
+  return (
+    <div
+      className="flex gap-2 cursor-pointer my-1"
+      onClick={() => navigate(`/note/${note._id}`)}
+      onMouseEnter={() => setNoteHover(true)}
+      onMouseLeave={() => setNoteHover(false)}
+    >
+      <div
+        onClick={(e) => {
+          e.stopPropagation();
+          setDeleteType("note");
+          setToDelete(note);
+          setDeleteMenuShown(true);
+        }}
+      >
+        <FaRegTrashAlt
+          className={`my-1  ${noteHover ? "text-red-500" : "text-transparent"}`}
+        />
+      </div>
+      <FaRegStickyNote className="my-1 shrink-0" />
+      <p key={i} className="cursor-pointer">
+        {note.name}
+      </p>
+    </div>
+  );
+}
+
 function SidePanel({
   username,
   folders,
@@ -71,9 +113,8 @@ function SidePanel({
               }}
             >
               <FaRegTrashAlt
-                className={`my-1  ${
-                  hover ? "text-red-500" : "text-transparent"
-                }`}
+                className={`my-1  ${hover ? "text-red-500" : "text-transparent"
+                  }`}
               />
             </div>
             <FaRegFolder className="my-1" />
@@ -86,11 +127,11 @@ function SidePanel({
                 setParentFolder(folder);
                 setShowNewMenu(true);
               }}
+              className="z-50"
             >
               <FaPlus
-                className={`my-2  ${
-                  hover ? "text-stone-400" : "text-transparent"
-                }`}
+                className={`my-2  ${hover ? "text-stone-400" : "text-transparent"
+                  }`}
               />
             </div>
             {showNewMenu && (
@@ -110,39 +151,19 @@ function SidePanel({
           </div>
         </div>
         <div
-          className={`${
-            open ? "h-auto overflow-visible" : "h-0 overflow-hidden"
-          }  ml-4`}
+          className={`${open ? "h-auto overflow-visible" : "h-0 overflow-hidden"
+            }  ml-4`}
         >
           {notes.map((note, i) => {
             if (note.folderId === folder._id) {
-              const [noteHover, setNoteHover] = useState<boolean>(false);
               return (
-                <div
-                  className="flex gap-2 cursor-pointer my-1"
-                  onClick={() => navigate(`/note/${note._id}`)}
-                  onMouseEnter={() => setNoteHover(true)}
-                  onMouseLeave={() => setNoteHover(false)}
-                >
-                  <div
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDeleteType("note");
-                      setToDelete(note);
-                      setDeleteMenuShown(true);
-                    }}
-                  >
-                    <FaRegTrashAlt
-                      className={`my-1  ${
-                        noteHover ? "text-red-500" : "text-transparent"
-                      }`}
-                    />
-                  </div>
-                  <FaRegStickyNote className="my-1" />
-                  <p key={i} className="cursor-pointer">
-                    {note.name}
-                  </p>
-                </div>
+                <NoteItem
+                  setDeleteType={setDeleteType}
+                  setToDelete={setToDelete}
+                  setDeleteMenuShown={setDeleteMenuShown}
+                  note={note}
+                  i={i}
+                />
               );
             }
             return null;
@@ -160,9 +181,8 @@ function SidePanel({
 
   return (
     <div
-      className={`h-full fixed ${
-        toggled ? "left-0" : "-left-48"
-      } top-0 w-60 bg-stone-900 rounded-r-3xl text-white`}
+      className={`h-full fixed ${toggled ? "left-0" : "-left-48"
+        } top-0 w-60 bg-stone-900 rounded-r-3xl text-white shadow-xl shadow-stone-900`}
       style={{
         transition: "all 0.3s ease-in-out",
       }}
@@ -184,7 +204,7 @@ function SidePanel({
                 className="flex gap-2 cursor-pointer my-2"
                 onClick={() => navigate(`/note/${note._id}`)}
               >
-                <FaRegStickyNote className="my-1" />
+                <FaRegStickyNote className="my-1 shrink-0"/>
                 <p key={i} className="cursor-pointer">
                   {note.name}
                 </p>

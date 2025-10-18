@@ -30,7 +30,7 @@ function Note() {
         setColours={setColours}
       />
       <div
-        className="absolute top-4 left-4 p-3 text-white text-2xl bg-stone-950 rounded-lg cursor-pointer z-50"
+        className="absolute top-4 left-4 p-3 text-white text-2xl bg-stone-950 rounded-lg cursor-pointer z-50 shadow-md shadow-stone-950"
         onClick={() => navigate("/dashboard")}
       >
         <FaHome />
