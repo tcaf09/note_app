@@ -189,7 +189,15 @@ function InfiniteCanvas({
         currentDistance / (activePointers.current.initialDistance || 1);
       const dampingFactor = 0.6;
       const dampedScaleFactor = 1 + (scaleFactor - 1) * dampingFactor;
-      setScale((activePointers.current.initialScale || 1) * dampedScaleFactor);
+      setScale(
+        Math.min(
+          Math.max(
+            (activePointers.current.initialScale || 1) * dampedScaleFactor,
+            0.3
+          ),
+          3
+        )
+      );
     }
   };
 

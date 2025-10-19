@@ -43,18 +43,6 @@ function LoginSignup() {
   const signupForm = (
     <>
       <div>
-        <label htmlFor="email" className="text-white">
-          Email:
-        </label>
-        <br />
-        <input
-          type="email"
-          id="email"
-          className="p-2 rounded-lg bg-white focus:outline-none"
-          ref={emailRef}
-        />
-      </div>
-      <div>
         <label htmlFor="username" className="text-white">
           Username:
         </label>
@@ -88,6 +76,18 @@ function LoginSignup() {
           id="confirmPassword"
           className="p-2 rounded-lg bg-white focus:outline-none"
           ref={confPasswordRef}
+        />
+      </div>
+      <div>
+        <label htmlFor="email" className="text-white">
+          Email:
+        </label>
+        <br />
+        <input
+          type="email"
+          id="email"
+          className="p-2 rounded-lg bg-white focus:outline-none"
+          ref={emailRef}
         />
       </div>
     </>
@@ -149,14 +149,18 @@ function LoginSignup() {
           <p
             onClick={() => toggleOption("login")}
             className={`cursor-pointer rounded-full ${
-              option === "login" ? "bg-black text-white shadow-sm shadow-black" : "text-black"
+              option === "login"
+                ? "bg-black text-white shadow-sm shadow-black"
+                : "text-black"
             } px-10 py-2`}
           >
             Login
           </p>
           <p
             className={`cursor-pointer rounded-full px-5 py-2 ${
-              option === "signup" ? "bg-black text-white shadow-sm shadow-black" : "text-black"
+              option === "signup"
+                ? "bg-black text-white shadow-sm shadow-black"
+                : "text-black"
             }`}
             onClick={() => {
               toggleOption("signup");
