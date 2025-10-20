@@ -301,7 +301,7 @@ function InfiniteCanvas({
       const isHit = p.points.some(([px, py]) => {
         const dx = px - x;
         const dy = py - y;
-        return Math.sqrt(dx * dx + dy * dy) < 20; // 20px eraser radius
+        return Math.sqrt(dx * dx + dy * dy) < 5; // 20px eraser radius
       });
       if (isHit) {
         deletedPaths.push(p);
