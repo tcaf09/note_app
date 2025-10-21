@@ -85,7 +85,7 @@ function Folder({
   setDeleteMenuShown: (v: boolean) => void;
   setParentFolder: (v: Folder | null) => void;
 }) {
-  const [open, setOpen] = useState<boolean>(true);
+  const [open, setOpen] = useState<boolean>(false);
   const [hover, setHover] = useState<boolean>(false);
   const [showNewMenu, setShowNewMenu] = useState<boolean>(false);
 

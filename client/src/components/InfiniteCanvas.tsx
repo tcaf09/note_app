@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import Textbox from "./Textbox";
 import ContextMenu from "./ContextMenu";
 import { getStroke } from "perfect-freehand";
-import { useParams } from "react-router-dom";
 import { type JSONContent } from "@tiptap/react";
 import { v4 as uuid } from "uuid";
 import * as htmlToImage from "html-to-image";
@@ -33,6 +32,14 @@ type Props = {
   colour: string;
   colours: string[];
   penSizes: number[];
+  paths: Path[];
+  textboxes: Box[];
+  setPaths: React.Dispatch<React.SetStateAction<Path[]>>;
+  setTextboxes: React.Dispatch<React.SetStateAction<Box[]>>;
+  id: string | undefined;
+  authToken: string | null;
+  isLoading: React.RefObject<boolean>
+  setSaved: React.Dispatch<React.SetStateAction<boolean>>
 };
 
 function InfiniteCanvas({
@@ -41,10 +48,15 @@ function InfiniteCanvas({
   colour,
   colours,
   penSizes,
+  paths,
+  textboxes,
+  setPaths,
+  setTextboxes,
+  id,
+  authToken,
+  isLoading,
+  setSaved,
 }: Props) {
-  const authToken = localStorage.getItem("token");
-  const { id } = useParams<{ id: string }>();
-  const isLoading = useRef<boolean>(true);
   const screenRef = useRef<HTMLDivElement>(null);
 
   const [pos, setPos] = useState<Pos>({ x: 0, y: 0 });
@@ -53,7 +65,7 @@ function InfiniteCanvas({
   const contextRef = useRef<HTMLDivElement>(null);
   const [contextPos, setContextPos] = useState<Pos | null>(null);
   const [contextTargetIndex, setContextTargetIndex] = useState<string | null>(
-    null
+    null,
   );
 
   const isPanning = useRef<boolean>(false);
@@ -64,23 +76,24 @@ function InfiniteCanvas({
     initialScale?: number;
   }>({ pointers: {} });
 
-  const [textboxes, setTextboxes] = useState<Box[]>([]);
   const [boxesToSave, setBoxesToSave] = useState<Box[]>([]);
   const [boxesToDelete, setBoxesToDelete] = useState<Box[]>([]);
 
   const [points, setPoints] = useState<[number, number, number][]>([]);
-  const [paths, setPaths] = useState<Path[]>([]);
   const [pathsToSave, setPathsToSave] = useState<Path[]>([]);
   const [pathsToDelete, setPathsToDelete] = useState<Path[]>([]);
   const drawing = useRef<boolean>(false);
 
+  const saving = useRef<boolean>(false);
   const saveNote = useCallback(
     async (
       pathsToSave: Path[],
       boxesToSave: Box[],
       boxesToDelete: Box[],
-      pathsToDelete: Path[]
+      pathsToDelete: Path[],
     ) => {
+      try {
+      saving.current = true
       let thumbnailUrl = "";
       if (screenRef.current) {
         thumbnailUrl = await htmlToImage.toJpeg(screenRef.current, {
@@ -104,7 +117,7 @@ function InfiniteCanvas({
             boxesToDelete,
             thumbnailUrl,
           }),
-        }
+        },
       );
 
       if (!res.ok) throw new Error("Error saving note");
@@ -112,8 +125,16 @@ function InfiniteCanvas({
       setBoxesToSave([]);
       setBoxesToDelete([]);
       setPathsToDelete([]);
+
+      setTimeout(() => setSaved(true), 0)
+      } catch (err) {
+        console.log(err)
+        saving.current = false
+      } finally {
+        saving.current = false
+      }
     },
-    [id, authToken]
+    [id, authToken, setSaved],
   );
 
   function resetGestures(e?: React.PointerEvent) {
@@ -147,7 +168,7 @@ function InfiniteCanvas({
       const [p1, p2] = Object.values(activePointers.current.pointers);
       const initialDistance = Math.hypot(
         p2.clientX - p1.clientX,
-        p2.clientY - p1.clientY
+        p2.clientY - p1.clientY,
       );
       activePointers.current.initialDistance = initialDistance;
       activePointers.current.initialScale = scale;
@@ -175,7 +196,7 @@ function InfiniteCanvas({
       const clampedX = Math.min(0, Math.max(newX, viewportWidth - canvasWidth));
       const clampedY = Math.min(
         0,
-        Math.max(newY, viewportHeight - canvasHeight)
+        Math.max(newY, viewportHeight - canvasHeight),
       );
 
       setPos({ x: clampedX, y: clampedY });
@@ -183,7 +204,7 @@ function InfiniteCanvas({
       const [p1, p2] = Object.values(activePointers.current.pointers);
       const currentDistance = Math.hypot(
         p2.clientX - p1.clientX,
-        p2.clientY - p1.clientY
+        p2.clientY - p1.clientY,
       );
       const scaleFactor =
         currentDistance / (activePointers.current.initialDistance || 1);
@@ -193,10 +214,10 @@ function InfiniteCanvas({
         Math.min(
           Math.max(
             (activePointers.current.initialScale || 1) * dampedScaleFactor,
-            0.3
+            0.3,
           ),
-          3
-        )
+          3,
+        ),
       );
     }
   };
@@ -227,7 +248,7 @@ function InfiniteCanvas({
         acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
         return acc;
       },
-      ["M", ...stroke[0], "Q"]
+      ["M", ...stroke[0], "Q"],
     );
 
     d.push("Z");
@@ -361,13 +382,13 @@ function InfiniteCanvas({
   function updateBoxContent(id: string, content: JSONContent) {
     if (isLoading.current) return;
     setTextboxes((prev) =>
-      prev.map((box) => (box.id === id ? { ...box, content: content } : box))
+      prev.map((box) => (box.id === id ? { ...box, content: content } : box)),
     );
     setBoxesToSave((prev) => {
       const exists = prev.find((b) => b.id === id);
       if (exists) {
         return prev.map((box) =>
-          box.id === id ? { ...box, content: content } : box
+          box.id === id ? { ...box, content: content } : box,
         );
       } else {
         const fullBox = textboxes.find((b) => b.id === id);
@@ -394,35 +415,7 @@ function InfiniteCanvas({
   }, []);
 
   useEffect(() => {
-    async function loadNote() {
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/notes/${id}`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: "Bearer " + authToken,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        if (!res.ok) throw new Error("Error loading note");
-
-        const data = await res.json();
-        setPaths(data.paths);
-        setTextboxes(data.textboxes);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        isLoading.current = false;
-      }
-    }
-
-    loadNote();
-  }, [id, authToken]);
-
-  useEffect(() => {
-    if (isLoading.current) {
+    if (isLoading.current || saving.current) {
       return;
     }
 
@@ -434,22 +427,24 @@ function InfiniteCanvas({
     ) {
       return;
     }
-
+    
+    setSaved(false)
     const timeout = setTimeout(() => {
-      saveNote(pathsToSave, boxesToSave, boxesToDelete, pathsToDelete);
+      if (!saving.current) {
+        saveNote(pathsToSave, boxesToSave, boxesToDelete, pathsToDelete);
+      }
     }, 5000);
 
     return () => clearTimeout(timeout);
-  }, [boxesToSave, pathsToSave, boxesToDelete, pathsToDelete, saveNote]);
+  }, [boxesToSave, pathsToSave, boxesToDelete, pathsToDelete, saveNote, isLoading, setSaved]);
 
   const stroke = getStroke(points, options);
   const pathData = getSvgPathFromStroke(stroke);
 
   return (
     <div
-      className={`${
-        selectedOption === "text" ? "cursor-text" : ""
-      } w-screen h-screen overflow-hidden`}
+      className={`${selectedOption === "text" ? "cursor-text" : ""
+        } w-screen h-screen overflow-hidden`}
       ref={screenRef}
     >
       <div
@@ -482,14 +477,14 @@ function InfiniteCanvas({
               if (isLoading.current) return;
               setTextboxes((prev) =>
                 prev.map((box) =>
-                  box.id === id ? { ...box, ...updates } : box
-                )
+                  box.id === id ? { ...box, ...updates } : box,
+                ),
               );
               setBoxesToSave((prev) => {
                 const exists = prev.find((box) => box.id === id);
                 if (exists) {
                   return prev.map((box) =>
-                    box.id === id ? { ...box, ...updates } : box
+                    box.id === id ? { ...box, ...updates } : box,
                   );
                 } else {
                   const existingBox = textboxes.find((box) => box.id === id);

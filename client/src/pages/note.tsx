@@ -3,8 +3,34 @@ import Toolbar from "../components/Toolbar";
 import InfiniteCanvas from "@/components/InfiniteCanvas";
 import { FaHome } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { useRef } from "react";
+import { type JSONContent } from "@tiptap/react";
+
+type Box = {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number | "auto";
+  content: JSONContent;
+};
+
+type Path = {
+  path: string;
+  colour: string;
+  points: [number, number, number][];
+};
 
 function Note() {
+  const authToken = localStorage.getItem("token");
+  const { id } = useParams<{ id: string }>();
+  const isLoading = useRef<boolean>(true);
+
+  const [paths, setPaths] = useState<Path[]>([]);
+  const [textboxes, setTextboxes] = useState<Box[]>([]);
+
   const navigate = useNavigate();
 
   const [selectedOption, setSelectedOption] = useState<string>("mouse");
@@ -16,6 +42,37 @@ function Note() {
     "#E07A5F",
     "#7FB069",
   ]);
+
+  const [noteName, setNoteName] = useState<string | null>(null);
+  const [saved, setSaved] = useState<boolean>(true);
+  useEffect(() => {
+    async function loadNote() {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/notes/${id}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: "Bearer " + authToken,
+              "Content-Type": "application/json",
+            },
+          },
+        );
+        if (!res.ok) throw new Error("Error loading note");
+
+        const data = await res.json();
+        setPaths(data.paths);
+        setTextboxes(data.textboxes);
+        setNoteName(data.name);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        isLoading.current = false;
+      }
+    }
+
+    loadNote();
+  }, [id, authToken]);
 
   return (
     <>
@@ -35,12 +92,24 @@ function Note() {
       >
         <FaHome />
       </div>
+      <div className="absolute top-4 right-4 p-3 px-6 text-white text-lg bg-stone-950 rounded-lg shadow-md shadow-stone-950 flex ">
+        <div className={`text-3xl mr-2 ${saved ? "text-transparent" : "text-white"}`}>•</div>
+        <div className="mt-1">{noteName || "Loading..."}</div>
+      </div>
       <InfiniteCanvas
         selectedOption={selectedOption}
         setSelectedOption={setSelectedOption}
         colour={colour}
         colours={colours}
         penSizes={penSizes}
+        paths={paths}
+        textboxes={textboxes}
+        setPaths={setPaths}
+        setTextboxes={setTextboxes}
+        id={id}
+        authToken={authToken}
+        isLoading={isLoading}
+        setSaved={setSaved}
       />
     </>
   );
