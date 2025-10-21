@@ -145,20 +145,20 @@ function NewNoteMenu({
   };
 
   return (
-    <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-stone-900 text-white z-50 p-10 rounded-2xl w-fit text-lg">
+    <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-stone-900 text-white z-50 p-10 rounded-2xl w-fit text-lg shadow-md shadow-stone-900">
       {!parentFolder && (
         <div className="flex rounded-full bg-white justify-between w-full p-1">
           <p
             onClick={() => setType("Note")}
             className={`cursor-pointer rounded-full ${
-              type === "Note" ? "bg-black text-white" : "text-black"
+              type === "Note" ? "bg-black text-white shadow-sm shadow-black" : "text-black"
             } px-10 py-2`}
           >
             Note
           </p>
           <p
             className={`cursor-pointer rounded-full px-5 py-2 ${
-              type === "Folder" ? "bg-black text-white" : "text-black"
+              type === "Folder" ? "bg-black text-white shadow-sm shadow-black" : "text-black"
             }`}
             onClick={() => {
               setType("Folder");
@@ -201,7 +201,7 @@ function NewNoteMenu({
               setShown(false);
             }
           }}
-          className="bg-stone-800 rounded-full w-1/2 p-3 block mx-auto cursor-pointer"
+          className="bg-stone-800 rounded-full w-1/2 p-3 block mx-auto cursor-pointer shadow-md hover:-translate-y-0.5 hover:shadow-stone-800 !transition-all !duration-300 !ease-in-out "
         >
           Create
         </button>

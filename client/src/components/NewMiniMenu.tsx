@@ -11,17 +11,20 @@ function NewMiniMenu({
 }) {
   const menuRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const handleClickOutside = (e: PointerEvent) => {
+    const handleClickOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setShowNewMenu(false);
       }
     };
-    document.addEventListener("pointerdown", handleClickOutside);
+    const timeoutId = setTimeout(() => {
+      document.addEventListener("mousedown", handleClickOutside);
+    }, 0);
 
     return () => {
-      document.removeEventListener("pointerdown", handleClickOutside);
+      clearTimeout(timeoutId)
+      document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [setShowNewMenu]);
   return (
     <div
       ref={menuRef}

@@ -2,13 +2,14 @@ import db from "../db/connection.js";
 import express from "express";
 import jwt from "jsonwebtoken";
 import { ObjectId } from "mongodb";
+import uploadImage from "../uploadImage.js";
 
 const router = express.Router();
 
 router.get("/", authenticateToken, async (req, res) => {
   try {
     const collection = db.collection("Notes");
-    const notes = await collection.find({ user: req.user.username }).toArray();
+    const notes = await collection.find({ user: req.user.username }).project({paths: 0, texboxes: 0}).toArray();
     res.status(200).send(notes);
   } catch (err) {
     res.status(500).send("Server Error");
@@ -69,8 +70,16 @@ router.patch("/:id", authenticateToken, async (req, res) => {
     const query = { _id: new ObjectId(noteId), user: req.user.username };
     const collection = db.collection("Notes");
     const note = await collection.findOne(query);
+
+    if (!note) {
+      return res.status(404).send({ message: "Note not found" });
+    }
+
+    const imageUrl = await uploadImage(req.body.thumbnailUrl, `note_${noteId}`);
+
     const boxesToAdd = [];
     const boxesToChange = [];
+
     for (const textbox of req.body.boxesToSave) {
       const boxExists = note.textboxes.find((box) => box.id === textbox.id);
       if (boxExists) {
@@ -78,16 +87,6 @@ router.patch("/:id", authenticateToken, async (req, res) => {
       } else {
         boxesToAdd.push(textbox);
       }
-    }
-
-    const pushUpdates = {
-      $push: {
-        paths: { $each: req.body.pathsToSave },
-      },
-    };
-
-    if (boxesToAdd.length > 0) {
-      pushUpdates.$push.textboxes = { $each: boxesToAdd };
     }
 
     for (const box of boxesToChange) {
@@ -100,29 +99,42 @@ router.patch("/:id", authenticateToken, async (req, res) => {
         },
         {
           arrayFilters: [{ "elem.id": box.id }],
-        }
+        },
       );
     }
 
-    const boxIdsToDelete = req.body.boxesToDelete.map((b) => b.id);
-    const pullUpdates = {
-      $pull: {
-        textboxes: { id: { $in: boxIdsToDelete } },
-        paths: { $in: req.body.pathsToDelete },
-      },
+    const updateOperation = {};
+
+    if (req.body.pathsToSave && req.body.pathsToSave.length > 0) {
+      updateOperation.$push = updateOperation.$push || {};
+      updateOperation.$push.paths = { $each: req.body.pathsToSave };
+    }
+
+    if (boxesToAdd.length > 0) {
+      updateOperation.$push = updateOperation.$push || {};
+      updateOperation.$push.textboxes = { $each: boxesToAdd };
+    }
+
+    const boxIdsToDelete = req.body.boxesToDelete?.map((b) => b.id) || [];
+    if (
+      boxIdsToDelete.length > 0 ||
+      (req.body.pathsToDelete && req.body.pathsToDelete.length > 0)
+    ) {
+      updateOperation.$pull = {};
+      if (boxIdsToDelete.length > 0) {
+        updateOperation.$pull.textboxes = { id: { $in: boxIdsToDelete } };
+      }
+      if (req.body.pathsToDelete && req.body.pathsToDelete.length > 0) {
+        updateOperation.$pull.paths = { $in: req.body.pathsToDelete };
+      }
+    }
+
+    updateOperation.$set = {
+      thumbnailUrl: imageUrl,
     };
 
-    const setUpdates = {
-      $set: {
-        thumbnailUrl: req.body.thumbnailUrl,
-      },
-    };
-
-    const pushResults = await collection.updateOne(query, pushUpdates);
-    const pullResults = await collection.updateOne(query, pullUpdates);
-    const setResults = await collection.updateOne(query, setUpdates);
-
-    res.status(200).send(pushResults, pullResults, setResults);
+    const result = await collection.updateOne(query, updateOperation);
+    res.status(200).send(result);
   } catch (err) {
     console.log(err);
     res.status(500).send({ message: "Server error" });

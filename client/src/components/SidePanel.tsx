@@ -29,13 +29,11 @@ function NoteItem({
   setToDelete,
   setDeleteMenuShown,
   note,
-  i,
 }: {
   setDeleteType: (v: "note" | "folder") => void;
   setToDelete: (v: Note | Folder) => void;
   setDeleteMenuShown: (v: boolean) => void;
   note: Note;
-  i: number;
 }) {
   const navigate = useNavigate();
   const [noteHover, setNoteHover] = useState<boolean>(false);
@@ -59,10 +57,133 @@ function NoteItem({
         />
       </div>
       <FaRegStickyNote className="my-1 shrink-0" />
-      <p key={i} className="cursor-pointer">
+      <p className="cursor-pointer">
         {note.name}
       </p>
     </div>
+  );
+}
+
+function Folder({
+  folder,
+  notes,
+  folders,
+  setNewNoteMenuShown,
+  setMenuType,
+  setDeleteType,
+  setToDelete,
+  setDeleteMenuShown,
+  setParentFolder,
+}: {
+  folder: Folder;
+  notes: Note[];
+  folders: Folder[];
+  setNewNoteMenuShown: (v: boolean) => void;
+  setMenuType: (v: "Folder" | "Note") => void;
+  setDeleteType: (v: "note" | "folder") => void;
+  setToDelete: (v: Note | Folder) => void;
+  setDeleteMenuShown: (v: boolean) => void;
+  setParentFolder: (v: Folder | null) => void;
+}) {
+  const [open, setOpen] = useState<boolean>(true);
+  const [hover, setHover] = useState<boolean>(false);
+  const [showNewMenu, setShowNewMenu] = useState<boolean>(false);
+
+  return (
+    <>
+      <div
+        className="flex justify-between cursor-pointer my-1"
+        onClick={() => setOpen(!open)}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+      >
+        <div className="flex gap-2">
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              setDeleteType("folder");
+              setToDelete(folder);
+              setDeleteMenuShown(true);
+            }}
+          >
+            <FaRegTrashAlt
+              className={`my-1  ${hover ? "text-red-500" : "text-transparent"}`}
+            />
+          </div>
+          <FaRegFolder className="my-1" />
+          <p>{folder.name}</p>
+        </div>
+        <div className="flex relative gap-2">
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              setParentFolder(folder);
+              setShowNewMenu((prev) => !prev);
+            }}
+            className="z-50"
+          >
+            <FaPlus
+              className={`my-2 pointer-events-none ${
+                hover || showNewMenu ? "text-stone-400" : "text-transparent"
+              }`}
+            />
+          </div>
+          {showNewMenu && (
+            <NewMiniMenu
+              setShowNewMenu={setShowNewMenu}
+              setNewNoteMenuShown={setNewNoteMenuShown}
+              setMenuType={setMenuType}
+            />
+          )}
+          <FaAngleUp
+            className="my-2"
+            style={{
+              transform: open ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "all 0.3s ease-in-out",
+            }}
+          />
+        </div>
+      </div>
+      <div
+        className={`${
+          open ? "h-auto overflow-visible" : "h-0 overflow-hidden"
+        }  ml-4`}
+      >
+        {notes.map((note, i) => {
+          if (note.folderId === folder._id) {
+            return (
+              <NoteItem
+                setDeleteType={setDeleteType}
+                setToDelete={setToDelete}
+                setDeleteMenuShown={setDeleteMenuShown}
+                note={note}
+                key={i}
+              />
+            );
+          }
+          return null;
+        })}
+        {folders.map((f, i) => {
+          if (f.parentId === folder._id) {
+            return (
+              <Folder
+                folder={f}
+                key={i}
+                notes={notes}
+                folders={folders}
+                setDeleteMenuShown={setDeleteMenuShown}
+                setMenuType={setMenuType}
+                setToDelete={setToDelete}
+                setDeleteType={setDeleteType}
+                setParentFolder={setParentFolder}
+                setNewNoteMenuShown={setNewNoteMenuShown}
+              />
+            );
+          }
+          return null;
+        })}
+      </div>
+    </>
   );
 }
 
@@ -89,98 +210,6 @@ function SidePanel({
 }) {
   const [toggled, setToggled] = useState<boolean>(false);
   const navigate = useNavigate();
-
-  function Folder({ folder }: { folder: Folder }) {
-    const [open, setOpen] = useState<boolean>(true);
-    const [hover, setHover] = useState<boolean>(false);
-    const [showNewMenu, setShowNewMenu] = useState<boolean>(false);
-
-    return (
-      <>
-        <div
-          className="flex justify-between cursor-pointer my-1"
-          onClick={() => setOpen(!open)}
-          onMouseEnter={() => setHover(true)}
-          onMouseLeave={() => setHover(false)}
-        >
-          <div className="flex gap-2">
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-                setDeleteType("folder");
-                setToDelete(folder);
-                setDeleteMenuShown(true);
-              }}
-            >
-              <FaRegTrashAlt
-                className={`my-1  ${
-                  hover ? "text-red-500" : "text-transparent"
-                }`}
-              />
-            </div>
-            <FaRegFolder className="my-1" />
-            <p>{folder.name}</p>
-          </div>
-          <div className="flex relative gap-2">
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-                setParentFolder(folder);
-                setShowNewMenu(true);
-              }}
-              className="z-50"
-            >
-              <FaPlus
-                className={`my-2  ${
-                  hover ? "text-stone-400" : "text-transparent"
-                }`}
-              />
-            </div>
-            {showNewMenu && (
-              <NewMiniMenu
-                setShowNewMenu={setShowNewMenu}
-                setNewNoteMenuShown={setNewNoteMenuShown}
-                setMenuType={setMenuType}
-              />
-            )}
-            <FaAngleUp
-              className="my-2"
-              style={{
-                transform: open ? "rotate(180deg)" : "rotate(0deg)",
-                transition: "all 0.3s ease-in-out",
-              }}
-            />
-          </div>
-        </div>
-        <div
-          className={`${
-            open ? "h-auto overflow-visible" : "h-0 overflow-hidden"
-          }  ml-4`}
-        >
-          {notes.map((note, i) => {
-            if (note.folderId === folder._id) {
-              return (
-                <NoteItem
-                  setDeleteType={setDeleteType}
-                  setToDelete={setToDelete}
-                  setDeleteMenuShown={setDeleteMenuShown}
-                  note={note}
-                  i={i}
-                />
-              );
-            }
-            return null;
-          })}
-          {folders.map((f, i) => {
-            if (f.parentId === folder._id) {
-              return <Folder folder={f} key={i} />;
-            }
-            return null;
-          })}
-        </div>
-      </>
-    );
-  }
 
   return (
     <div
@@ -218,7 +247,20 @@ function SidePanel({
         })}
         {folders.map((folder, i) => {
           if (folder.parentId === null) {
-            return <Folder folder={folder} key={i} />;
+            return (
+              <Folder
+                folder={folder}
+                key={i}
+                notes={notes}
+                folders={folders}
+                setNewNoteMenuShown={setNewNoteMenuShown}
+                setParentFolder={setParentFolder}
+                setDeleteType={setDeleteType}
+                setToDelete={setToDelete}
+                setMenuType={setMenuType}
+                setDeleteMenuShown={setDeleteMenuShown}
+              />
+            );
           }
           return null;
         })}
