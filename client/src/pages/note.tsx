@@ -92,7 +92,7 @@ function Note() {
       >
         <FaHome />
       </div>
-      <div className="absolute top-4 right-4 p-3 px-6 text-white text-lg bg-stone-950 rounded-lg shadow-md shadow-stone-950 flex ">
+      <div className="absolute top-4 right-4 p-3 px-6 text-white text-lg bg-stone-950 rounded-lg shadow-md shadow-stone-950 flex z-50">
         <div className={`text-3xl mr-2 ${saved ? "text-transparent" : "text-white"}`}>•</div>
         <div className="mt-1">{noteName || "Loading..."}</div>
       </div>
