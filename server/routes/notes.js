@@ -114,19 +114,23 @@ router.patch("/:id", authenticateToken, async (req, res) => {
       updateOperation.$push = updateOperation.$push || {};
       updateOperation.$push.textboxes = { $each: boxesToAdd };
     }
-
+    
+    const pullOp = {}
     const boxIdsToDelete = req.body.boxesToDelete?.map((b) => b.id) || [];
     if (
       boxIdsToDelete.length > 0 ||
       (req.body.pathsToDelete && req.body.pathsToDelete.length > 0)
     ) {
-      updateOperation.$pull = {};
+      pullOp.$pull = {};
       if (boxIdsToDelete.length > 0) {
-        updateOperation.$pull.textboxes = { id: { $in: boxIdsToDelete } };
+        pullOp.$pull.textboxes = { id: { $in: boxIdsToDelete } };
       }
       if (req.body.pathsToDelete && req.body.pathsToDelete.length > 0) {
-        updateOperation.$pull.paths = { $in: req.body.pathsToDelete };
+        pullOp.$pull.paths = { $in: req.body.pathsToDelete };
       }
+    }
+    if (pullOp.$pull) {
+      await collection.updateOne(query, pullOp)
     }
 
     updateOperation.$set = {
