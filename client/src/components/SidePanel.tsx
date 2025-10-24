@@ -57,9 +57,7 @@ function NoteItem({
         />
       </div>
       <FaRegStickyNote className="my-1 shrink-0" />
-      <p className="cursor-pointer">
-        {note.name}
-      </p>
+      <p className="cursor-pointer">{note.name}</p>
     </div>
   );
 }
@@ -123,9 +121,8 @@ function Folder({
             className="z-50"
           >
             <FaPlus
-              className={`my-2 pointer-events-none ${
-                hover || showNewMenu ? "text-stone-400" : "text-transparent"
-              }`}
+              className={`my-2 pointer-events-none ${hover || showNewMenu ? "text-stone-400" : "text-transparent"
+                }`}
             />
           </div>
           {showNewMenu && (
@@ -145,9 +142,8 @@ function Folder({
         </div>
       </div>
       <div
-        className={`${
-          open ? "h-auto overflow-visible" : "h-0 overflow-hidden"
-        }  ml-4`}
+        className={`${open ? "h-auto overflow-visible" : "h-0 overflow-hidden"
+          }  ml-4`}
       >
         {notes.map((note, i) => {
           if (note.folderId === folder._id) {
@@ -213,9 +209,8 @@ function SidePanel({
 
   return (
     <div
-      className={`h-full fixed ${
-        toggled ? "left-0" : "-left-48"
-      } top-0 w-60 bg-stone-900 rounded-r-3xl text-white shadow-xl shadow-stone-900`}
+      className={`h-full fixed ${toggled ? "left-0" : "-left-48"
+        } top-0 w-60 inset-shadow-sm inset-shadow-stone-700 bg-gradient-to-b from-stone-900 to-stone-950 via-stone-950 rounded-r-3xl text-stone-300 shadow-sm shadow-stone-950`}
       style={{
         transition: "all 0.3s ease-in-out",
       }}
@@ -238,7 +233,7 @@ function SidePanel({
                 onClick={() => navigate(`/note/${note._id}`)}
               >
                 <FaRegStickyNote className="my-1 shrink-0" />
-                <p key={i} className="cursor-pointer">
+                <p key={i} className="cursor-pointer truncate">
                   {note.name}
                 </p>
               </div>

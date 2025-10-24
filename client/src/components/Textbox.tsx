@@ -13,12 +13,6 @@ type Box = {
   content: JSONContent;
 };
 
-// type Path = {
-//   path: string;
-//   colour: string;
-//   points: [number, number, number][];
-// };
-
 type TextboxProps = {
   props: Box;
   handleContextMenu: (e: React.MouseEvent) => void;

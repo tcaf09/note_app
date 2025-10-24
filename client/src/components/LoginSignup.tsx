@@ -14,26 +14,26 @@ function LoginSignup() {
   const loginForm = (
     <>
       <div>
-        <label htmlFor="username" className="text-white">
+        <label htmlFor="username" className="text-stone-300">
           Username:
         </label>
         <br />
         <input
           type="text"
           id="username"
-          className="p-2 rounded-lg bg-white focus:outline-none"
+          className="p-2 rounded-lg bg-stone-300 focus:outline-none"
           ref={userRef}
         />
       </div>
       <div>
-        <label htmlFor="password" className="text-white">
+        <label htmlFor="password" className="text-stone-300">
           Password
         </label>
         <br />
         <input
           type="password"
           id="password"
-          className="p-2 rounded-lg bg-white focus:outline-none"
+          className="p-2 rounded-lg bg-stone-300 focus:outline-none"
           ref={passwordRef}
         />
       </div>
@@ -43,50 +43,50 @@ function LoginSignup() {
   const signupForm = (
     <>
       <div>
-        <label htmlFor="username" className="text-white">
+        <label htmlFor="username" className="text-stone-300">
           Username:
         </label>
         <br />
         <input
           type="text"
           id="username"
-          className="p-2 rounded-lg bg-white focus:outline-none"
+          className="p-2 rounded-lg bg-stone-300 focus:outline-none"
           ref={userRef}
         />
       </div>
       <div>
-        <label htmlFor="password" className="text-white">
+        <label htmlFor="password" className="text-stone-300">
           Password:
         </label>
         <br />
         <input
           type="password"
           id="password"
-          className="p-2 rounded-lg bg-white focus:outline-none"
+          className="p-2 rounded-lg bg-stone-300 focus:outline-none"
           ref={passwordRef}
         />
       </div>
       <div>
-        <label htmlFor="confirmPassword" className="text-white">
+        <label htmlFor="confirmPassword" className="text-stone-300">
           Confirm Password:
         </label>
         <br />
         <input
           type="password"
           id="confirmPassword"
-          className="p-2 rounded-lg bg-white focus:outline-none"
+          className="p-2 rounded-lg bg-stone-300 focus:outline-none"
           ref={confPasswordRef}
         />
       </div>
       <div>
-        <label htmlFor="email" className="text-white">
+        <label htmlFor="email" className="text-stone-300">
           Email:
         </label>
         <br />
         <input
           type="email"
           id="email"
-          className="p-2 rounded-lg bg-white focus:outline-none"
+          className="p-2 rounded-lg bg-stone-300 focus:outline-none"
           ref={emailRef}
         />
       </div>
@@ -107,7 +107,7 @@ function LoginSignup() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, password }),
-        }
+        },
       );
 
       const data = await res.json();
@@ -132,10 +132,15 @@ function LoginSignup() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, password, email }),
-        }
+        },
       );
 
-      if (!res.ok) throw new Error("Signup Failed");
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.message);
+        return;
+      }
+      localStorage.setItem("token", data.accessToken);
       navigate("/dashboard");
     } catch (err) {
       console.log(err);
@@ -144,24 +149,21 @@ function LoginSignup() {
 
   return (
     <div className="flex items-center justify-center h-screen">
-      <div className=" bg-black w-auto h-2/3 rounded-[25px] flex flex-col items-center justify-between px-24 py-5 shadow-xl shadow-black">
-        <div className="flex rounded-full bg-white justify-between w-full p-1">
+      <div className=" bg-gradient-to-b from-stone-900 via-stone-950 to-stone-950 inset-shadow-sm inset-shadow-stone-700 shadow-sm shadow-stone-stone-950 w-auto h-2/3 rounded-[25px] flex flex-col items-center justify-between px-24 py-5">
+        <div className="flex h-12 rounded-full bg-stone-900 inset-shadow-xs inset-shadow-stone-700 shadow-xs shadow-stone-950 justify-between w-full p-1 relative">
+          <div
+            className={`absolute ${option === "login" ? "translate-x-0 w-28" : "translate-x-[calc(100%+1.4rem)] w-24"} h-10 rounded-full bg-stone-800 text-stone-300 shadow-xs shadow-stone-950 inset-shadow-xs inset-shadow-stone-700 !transition-all !duration-300 !ease-in-out`}
+          ></div>
           <p
             onClick={() => toggleOption("login")}
-            className={`cursor-pointer rounded-full ${
-              option === "login"
-                ? "bg-black text-white shadow-sm shadow-black"
-                : "text-black"
-            } px-10 py-2`}
+            className={`cursor-pointer rounded-full z-50 ${option === "login" ? "text-stone-300" : "text-stone-500"
+              } px-10 py-2`}
           >
             Login
           </p>
           <p
-            className={`cursor-pointer rounded-full px-5 py-2 ${
-              option === "signup"
-                ? "bg-black text-white shadow-sm shadow-black"
-                : "text-black"
-            }`}
+            className={`cursor-pointer rounded-full px-5 py-2 z-50 ${option === "signup" ? "text-stone-300" : "text-stone-500"
+              }`}
             onClick={() => {
               toggleOption("signup");
             }}
@@ -180,7 +182,7 @@ function LoginSignup() {
           {option === "login" ? loginForm : signupForm}
         </div>
         <button
-          className="border-none bg-white w-3/4 rounded-full py-2 my-5 cursor-pointer hover:shadow-md hover:shadow-white hover:-translate-y-0.5 !transition-all !duration-300 !ease-in-out"
+          className="text-stone-300 border-none bg-stone-800  hover:scale-103 inset-shadow-sm inset-shadow-stone-700 shadow-sm shadow-stone-950 w-3/4 rounded-full py-2 my-5 cursor-pointer !transition-all !duration-300 !ease-in-out"
           onClick={() => {
             if (option === "login" && userRef.current && passwordRef.current) {
               login(userRef.current.value, passwordRef.current.value);
@@ -201,7 +203,7 @@ function LoginSignup() {
                 signUp(
                   userRef.current.value,
                   passwordRef.current.value,
-                  emailRef.current.value
+                  emailRef.current.value,
                 );
               }
             }

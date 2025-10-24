@@ -9,7 +9,10 @@ const router = express.Router();
 router.get("/", authenticateToken, async (req, res) => {
   try {
     const collection = db.collection("Notes");
-    const notes = await collection.find({ user: req.user.username }).project({paths: 0, texboxes: 0}).toArray();
+    const notes = await collection
+      .find({ user: req.user.username })
+      .project({ paths: 0, texboxes: 0 })
+      .toArray();
     res.status(200).send(notes);
   } catch (err) {
     res.status(500).send("Server Error");
@@ -114,8 +117,8 @@ router.patch("/:id", authenticateToken, async (req, res) => {
       updateOperation.$push = updateOperation.$push || {};
       updateOperation.$push.textboxes = { $each: boxesToAdd };
     }
-    
-    const pullOp = {}
+
+    const pullOp = {};
     const boxIdsToDelete = req.body.boxesToDelete?.map((b) => b.id) || [];
     if (
       boxIdsToDelete.length > 0 ||
@@ -130,7 +133,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
       }
     }
     if (pullOp.$pull) {
-      await collection.updateOne(query, pullOp)
+      await collection.updateOne(query, pullOp);
     }
 
     updateOperation.$set = {

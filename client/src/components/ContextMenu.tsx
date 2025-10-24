@@ -13,12 +13,15 @@ const ContextMenu = forwardRef<HTMLDivElement, ContextMenuProps>(
         style={{ top: pos.y, left: pos.x }}
         ref={ref}
       >
-        <button onClick={onDelete} className="px-2 rounded-md hover:text-black hover:bg-white">
+        <button
+          onClick={onDelete}
+          className="px-2 rounded-md hover:text-black hover:bg-white"
+        >
           Delete
         </button>
       </div>
     );
-  }
+  },
 );
 
 ContextMenu.displayName = "ContextMenu";

@@ -38,8 +38,8 @@ type Props = {
   setTextboxes: React.Dispatch<React.SetStateAction<Box[]>>;
   id: string | undefined;
   authToken: string | null;
-  isLoading: React.RefObject<boolean>
-  setSaved: React.Dispatch<React.SetStateAction<boolean>>
+  isLoading: React.RefObject<boolean>;
+  setSaved: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 function InfiniteCanvas({
@@ -93,45 +93,45 @@ function InfiniteCanvas({
       pathsToDelete: Path[],
     ) => {
       try {
-      saving.current = true
-      let thumbnailUrl = "";
-      if (screenRef.current) {
-        thumbnailUrl = await htmlToImage.toJpeg(screenRef.current, {
-          quality: 0.5,
-          backgroundColor: "#0c0a09",
-        });
-      }
+        saving.current = true;
+        let thumbnailUrl = "";
+        if (screenRef.current) {
+          thumbnailUrl = await htmlToImage.toJpeg(screenRef.current, {
+            quality: 0.5,
+            backgroundColor: "#0c0a09",
+          });
+        }
 
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/notes/${id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + authToken,
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/notes/${id}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + authToken,
+            },
+            body: JSON.stringify({
+              pathsToSave,
+              boxesToSave,
+              pathsToDelete,
+              boxesToDelete,
+              thumbnailUrl,
+            }),
           },
-          body: JSON.stringify({
-            pathsToSave,
-            boxesToSave,
-            pathsToDelete,
-            boxesToDelete,
-            thumbnailUrl,
-          }),
-        },
-      );
+        );
 
-      if (!res.ok) throw new Error("Error saving note");
-      setPathsToSave([]);
-      setBoxesToSave([]);
-      setBoxesToDelete([]);
-      setPathsToDelete([]);
+        if (!res.ok) throw new Error("Error saving note");
+        setPathsToSave([]);
+        setBoxesToSave([]);
+        setBoxesToDelete([]);
+        setPathsToDelete([]);
 
-      setTimeout(() => setSaved(true), 0)
+        setTimeout(() => setSaved(true), 0);
       } catch (err) {
-        console.log(err)
-        saving.current = false
+        console.log(err);
+        saving.current = false;
       } finally {
-        saving.current = false
+        saving.current = false;
       }
     },
     [id, authToken, setSaved],
@@ -427,8 +427,8 @@ function InfiniteCanvas({
     ) {
       return;
     }
-    
-    setSaved(false)
+
+    setSaved(false);
     const timeout = setTimeout(() => {
       if (!saving.current) {
         saveNote(pathsToSave, boxesToSave, boxesToDelete, pathsToDelete);
@@ -436,7 +436,15 @@ function InfiniteCanvas({
     }, 5000);
 
     return () => clearTimeout(timeout);
-  }, [boxesToSave, pathsToSave, boxesToDelete, pathsToDelete, saveNote, isLoading, setSaved]);
+  }, [
+    boxesToSave,
+    pathsToSave,
+    boxesToDelete,
+    pathsToDelete,
+    saveNote,
+    isLoading,
+    setSaved,
+  ]);
 
   const stroke = getStroke(points, options);
   const pathData = getSvgPathFromStroke(stroke);

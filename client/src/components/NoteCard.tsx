@@ -31,16 +31,22 @@ function NoteCard({
 
   return (
     <div
-      className="bg-stone-950 w-52 rounded-xl shadow-md"
+      className="bg-stone-950 w-52 rounded-xl shadow-sm shadow-stone-950 curosr-pointer"
       onClick={() => navigate(`/note/${note._id}`)}
     >
-      <img
-        src={note.thumbnailUrl}
-        className="h-40 text-white flex items-center justify-center cursor-pointer object-cover rounded-t-xl"
-      />
+      <div
+        className="h-40 text-stone-300 flex items-center justify-center cursor-pointer object-cover rounded-t-xl inset-shadow-sm inset-shadow-stone-700"
+        style={{
+          backgroundImage: `url(${note.thumbnailUrl})`,
+          backgroundSize: "cover",
+        }}
+      ></div>
+
       <div className="bg-stone-900 p-2 rounded-b-xl flex justify-between">
         <div>
-          <p className="text-white text-xl">{note.name}</p>
+          <p className="text-stone-300 text-xl break-all line-clamp-2 whitespace-normal">
+            {note.name}
+          </p>
           <div className="flex text-stone-500">
             <FaRegFolder className="my-1" />
             <p className="mx-2">{folder.name}</p>

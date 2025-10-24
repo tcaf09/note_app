@@ -43,11 +43,10 @@ function ColourOption({
   return (
     <div className="relative inline-block mx-2 my-auto">
       <div
-        className={`h-auto w-auto rounded-full p-1 flex border ${
-          selected === "pen" && colour === c
+        className={`h-auto w-auto rounded-full p-1 flex border ${selected === "pen" && colour === c
             ? "border-white bg-white/20"
             : "border-transparent"
-        }`}
+          }`}
         onClick={() => {
           if (selected === "pen" && colour === c) {
             setMenuShown(true);
@@ -63,9 +62,8 @@ function ColourOption({
         ></div>
       </div>
       <div
-        className={`${
-          menuShown ? "absolute" : "hidden"
-        } left-1/2 -translate-x-1/2 top-[150%] w-40 flex flex-col bg-stone-950 p-2 rounded-lg`}
+        className={`${menuShown ? "absolute" : "hidden"
+          } left-1/2 -translate-x-1/2 top-[150%] w-40 flex flex-col bg-stone-950 p-2 rounded-lg`}
         ref={menuRef}
       >
         <input

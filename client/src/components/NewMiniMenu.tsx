@@ -21,7 +21,7 @@ function NewMiniMenu({
     }, 0);
 
     return () => {
-      clearTimeout(timeoutId)
+      clearTimeout(timeoutId);
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [setShowNewMenu]);

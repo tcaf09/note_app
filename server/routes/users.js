@@ -37,7 +37,12 @@ router.post("/register", async (req, res) => {
       }
     }
     const result = await collection.insertOne(newUser);
-    res.status(200).send(result);
+    let accessToken = "";
+    if (result) {
+      const payload = { username: username };
+      accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET);
+    }
+    res.status(200).json({ accessToken });
   } catch (err) {
     console.log(err);
     res.status(500).send({ message: "Error adding user" });
@@ -55,17 +60,17 @@ router.post("/login", async (req, res) => {
 
     const collection = db.collection("Users");
     const user = await collection.findOne({ username });
-
-    if (user) {
-      const passwordMatch = await bcrypt.compare(password, user.hashedPassword);
-      if (passwordMatch) {
-        const payload = { username: user.username };
-        const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET);
-        res.status(200).json({ accessToken });
-      }
-    } else {
+    if (!user) {
       res.status(401).send({ message: "Invalid Credentials" });
     }
+
+    const passwordMatch = await bcrypt.compare(password, user.hashedPassword);
+    if (!passwordMatch) {
+      res.status(401).send({ message: "Invalid Credentials" });
+    }
+    const payload = { username: user.username };
+    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET);
+    res.status(200).json({ accessToken });
   } catch (err) {
     console.log(err);
     res.status(500).send({ message: "Server error" });

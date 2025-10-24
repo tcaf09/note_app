@@ -66,7 +66,7 @@ function DeleteMenu({
   }
 
   return (
-    <div className="z-50 text-white fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-stone-900 rounded-2xl p-4 flex flex-col items-center">
+    <div className="z-50 text-stone-300 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-b from-stone-900 to-stone-950 inset-shadow-xs inset-shadow-stone-700 shadow-sm shadow-stone-950 rounded-2xl p-4 flex flex-col items-center">
       <h2>Delete {toDelete.name}?</h2>
       <div className="w-full flex gap-4 my-2">
         <button
@@ -87,7 +87,7 @@ function DeleteMenu({
           Confirm
         </button>
         <button
-          className="grow p-2 rounded-lg border border-transparent hover:border-white hover:bg-white/20 cursor-pointer"
+          className="grow p-2 rounded-lg border border-transparent hover:border-stone-300 hover:bg-stone-300/20 cursor-pointer"
           style={{ transition: "all 0.1s ease-in-out" }}
           onClick={() => setShown(false)}
         >

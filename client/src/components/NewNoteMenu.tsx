@@ -27,7 +27,7 @@ function NewNoteMenu({
   parentFolder: Folder | null;
 }) {
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(
-    parentFolder
+    parentFolder,
   );
   const nameRef = useRef<HTMLInputElement>(null);
 
@@ -42,7 +42,7 @@ function NewNoteMenu({
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/notes`, {
         method: "POST",
         headers: {
-          "Authorization": "Bearer " + authToken,
+          Authorization: "Bearer " + authToken,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -62,7 +62,7 @@ function NewNoteMenu({
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/folders`, {
         method: "POST",
         headers: {
-          "Authorization": "Bearer " + authToken,
+          Authorization: "Bearer " + authToken,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -111,16 +111,15 @@ function NewNoteMenu({
       <div className="relative">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex flex-row cursor-pointer bg-white text-black rounded-md p-2 w-40 justify-between"
+          className="flex flex-row cursor-pointer bg-stone-300 text-black rounded-md p-2 w-40 justify-between"
         >
           {selectedFolder?.name || "Select Folder..."}
           <FaAngleUp
-            className={`${
-              isOpen ? "rotate-180" : "rotate-0"
-            } !transition-all !duration-300 !ease-in-out my-1`}
+            className={`${isOpen ? "rotate-180" : "rotate-0"
+              } !transition-all !duration-300 !ease-in-out my-1`}
           />
         </button>
-        <div className="bg-white rounded-md text-black absolute top-full mt-2 w-52 max-h-40 overflow-y-auto">
+        <div className="bg-stone-300 rounded-md text-black absolute top-full mt-2 w-52 max-h-40 overflow-y-auto">
           {isOpen && (
             <>
               <div
@@ -135,7 +134,7 @@ function NewNoteMenu({
               {folders.map((folder) =>
                 folder.parentId === null ? (
                   <FolderComponent folder={folder} key={folder._id} />
-                ) : null
+                ) : null,
               )}
             </>
           )}
@@ -145,26 +144,27 @@ function NewNoteMenu({
   };
 
   return (
-    <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-stone-900 text-white z-50 p-10 rounded-2xl w-fit text-lg shadow-md shadow-stone-900">
+    <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-b to-stone-950 from-stone-900 to-40% inset-shadow-xs inset-shadow-stone-700 shadow-sm shadow-stone-950 text-stone-300 z-50 p-10 rounded-2xl w-fit text-lg">
       {!parentFolder && (
-        <div className="flex rounded-full bg-white justify-between w-full p-1">
+        <div className="flex h-12 rounded-full bg-stone-900 inset-shadow-xs inset-shadow-stone-700 shadow-xs shadow-stone-950 justify-between w-full p-1 relative">
+          <div
+            className={`absolute ${type === "Folder" ? "translate-x-0 w-32" : "translate-x-[calc(100%+0.5rem)] w-28"} h-10 rounded-full bg-stone-800 text-stone-300 shadow-xs shadow-stone-950 inset-shadow-xs inset-shadow-stone-700 !transition-all !duration-300 !ease-in-out`}
+          ></div>
           <p
-            onClick={() => setType("Note")}
-            className={`cursor-pointer rounded-full ${
-              type === "Note" ? "bg-black text-white shadow-sm shadow-black" : "text-black"
-            } px-10 py-2`}
-          >
-            Note
-          </p>
-          <p
-            className={`cursor-pointer rounded-full px-5 py-2 ${
-              type === "Folder" ? "bg-black text-white shadow-sm shadow-black" : "text-black"
-            }`}
-            onClick={() => {
-              setType("Folder");
-            }}
+            onClick={() => setType("Folder")}
+            className={`cursor-pointer rounded-full z-50 ${type === "Folder" ? "text-stone-300" : "text-stone-500"
+              } px-10 py-2`}
           >
             Folder
+          </p>
+          <p
+            className={`cursor-pointer rounded-full px-5 py-2 z-50 ${type === "Note" ? "text-stone-300" : "text-stone-500"
+              }`}
+            onClick={() => {
+              setType("Note");
+            }}
+          >
+            Signup
           </p>
         </div>
       )}
@@ -175,7 +175,7 @@ function NewNoteMenu({
         <input
           type="text"
           id="name"
-          className="p-2 rounded-lg bg-white focus:outline-none text-black"
+          className="p-2 rounded-lg bg-stone-300 focus:outline-none text-black"
           ref={nameRef}
         />
         <br />
@@ -201,7 +201,7 @@ function NewNoteMenu({
               setShown(false);
             }
           }}
-          className="bg-stone-800 rounded-full w-1/2 p-3 block mx-auto cursor-pointer shadow-md hover:-translate-y-0.5 hover:shadow-stone-800 !transition-all !duration-300 !ease-in-out "
+          className="bg-stone-800 rounded-full w-1/2 p-3 block mx-auto cursor-pointer inset-shadow-sm inset-shadow-stone-700 shadow-sm shadow-stone-950 !transition-all !duration-300 !ease-in-out hover:scale-103"
         >
           Create
         </button>

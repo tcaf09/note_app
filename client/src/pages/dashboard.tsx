@@ -57,8 +57,8 @@ function Dashboard() {
     } catch (err) {
       console.log(err);
     }
-  }, [authToken])
-  
+  }, [authToken]);
+
   const getFolders = useCallback(async () => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/folders/`, {
@@ -75,7 +75,7 @@ function Dashboard() {
     } catch (err) {
       console.log(err);
     }
-  }, [authToken])
+  }, [authToken]);
 
   useEffect(() => {
     async function getUser() {
@@ -138,12 +138,12 @@ function Dashboard() {
           />
         </>
       )}
-      <h1 className="text-white mx-auto my-20 text-center text-6xl">
+      <h1 className="text-stone-300 mx-auto my-20 text-center text-6xl">
         Welcome, {user && user.username}
       </h1>
-      <div className="w-2/3 p-10 mx-auto rounded-3xl bg-black relative shadow-xl shadow-black">
+      <div className="w-2/3 p-10 mx-auto rounded-3xl bg-gradient-to-b to-stone-950 from-stone-900 to-20% inset-shadow-sm inset-shadow-stone-700 relative shadow-sm shadow-stone-950">
         <button
-          className="bg-stone-800 text-white p-3 rounded-md absolute right-4 top-4 cursor-pointer"
+          className="bg-stone-800 inset-shadow-sm inset-shadow-stone-700 shadow-sm shadow-stone-950 text-stone-300 p-3 rounded-md absolute right-4 top-4 cursor-pointer"
           onClick={() => {
             setParentFolder(null);
             setNewNoteMenuShown(true);
