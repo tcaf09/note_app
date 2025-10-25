@@ -21,3 +21,8 @@ ul {
   list-style-type: disc;
   margin-left: 1.5rem; /* optional indent */
 }
+
+ol {
+  list-style-type: decimal;
+  margin-left: 1.5rem;
+}
