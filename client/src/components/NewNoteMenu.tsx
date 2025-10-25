@@ -144,7 +144,7 @@ function NewNoteMenu({
   };
 
   return (
-    <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-b to-stone-950 from-stone-900 to-40% inset-shadow-xs inset-shadow-stone-700 shadow-sm shadow-stone-950 text-stone-300 z-50 p-10 rounded-2xl w-fit text-lg">
+    <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-stone-950 inset-shadow-xs inset-shadow-stone-700 shadow-sm shadow-stone-950 text-stone-300 z-50 p-10 rounded-2xl w-fit text-lg">
       {!parentFolder && (
         <div className="flex h-12 rounded-full bg-stone-900 inset-shadow-xs inset-shadow-stone-700 shadow-xs shadow-stone-950 justify-between w-full p-1 relative">
           <div

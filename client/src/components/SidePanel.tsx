@@ -209,8 +209,8 @@ function SidePanel({
 
   return (
     <div
-      className={`h-full fixed ${toggled ? "left-0" : "-left-48"
-        } top-0 w-60 inset-shadow-sm inset-shadow-stone-700 bg-gradient-to-b from-stone-900 to-stone-950 via-stone-950 rounded-r-3xl text-stone-300 shadow-sm shadow-stone-950`}
+      className={`h-screen fixed ${toggled ? "left-0" : "-left-48"
+        } top-0 w-60 inset-shadow-sm inset-shadow-stone-700 bg-stone-950 rounded-r-3xl text-stone-300 shadow-sm shadow-stone-950`}
       style={{
         transition: "all 0.3s ease-in-out",
       }}

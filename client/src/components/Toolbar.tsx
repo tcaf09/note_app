@@ -31,7 +31,7 @@ function Toolbar({
   const [newColour, setNewColour] = useState<string>("#ffffff");
 
   return (
-    <div className=" absolute top-4 left-1/2 -translate-x-1/2 z-50 w-auto rounded-lg p-3 bg-gradient-to-b from-stone-900 to-stone-950 to-30% inset-shadow-sm inset-shadow-stone-700 flex shadow-sm shadow-stone-950">
+    <div className=" absolute top-4 left-1/2 -translate-x-1/2 z-50 w-auto rounded-lg p-3 bg-stone-950 inset-shadow-sm inset-shadow-stone-700 flex shadow-sm shadow-stone-950">
       <div
         className={`mx-2 ${selected === "mouse"
             ? "border-stone-300 bg-stone-300/20"

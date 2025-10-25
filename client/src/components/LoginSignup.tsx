@@ -107,7 +107,7 @@ function LoginSignup() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, password }),
-        },
+        }
       );
 
       const data = await res.json();
@@ -132,7 +132,7 @@ function LoginSignup() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, password, email }),
-        },
+        }
       );
 
       const data = await res.json();
@@ -149,21 +149,27 @@ function LoginSignup() {
 
   return (
     <div className="flex items-center justify-center h-screen">
-      <div className=" bg-gradient-to-b from-stone-900 via-stone-950 to-stone-950 inset-shadow-sm inset-shadow-stone-700 shadow-sm shadow-stone-stone-950 w-auto h-2/3 rounded-[25px] flex flex-col items-center justify-between px-24 py-5">
+      <div className="bg-gradient-to-b to-stone-950 from-stone-900 to-30% inset-shadow-sm inset-shadow-stone-700 shadow-sm shadow-stone-stone-950 w-auto h-2/3 rounded-[25px] flex flex-col items-center justify-between px-24 py-5">
         <div className="flex h-12 rounded-full bg-stone-900 inset-shadow-xs inset-shadow-stone-700 shadow-xs shadow-stone-950 justify-between w-full p-1 relative">
           <div
-            className={`absolute ${option === "login" ? "translate-x-0 w-28" : "translate-x-[calc(100%+1.4rem)] w-24"} h-10 rounded-full bg-stone-800 text-stone-300 shadow-xs shadow-stone-950 inset-shadow-xs inset-shadow-stone-700 !transition-all !duration-300 !ease-in-out`}
+            className={`absolute ${
+              option === "login"
+                ? "translate-x-0 w-28"
+                : "translate-x-[calc(100%+1.4rem)] w-24"
+            } h-10 rounded-full bg-stone-800 text-stone-300 shadow-xs shadow-stone-950 inset-shadow-xs inset-shadow-stone-700 !transition-all !duration-300 !ease-in-out`}
           ></div>
           <p
             onClick={() => toggleOption("login")}
-            className={`cursor-pointer rounded-full z-50 ${option === "login" ? "text-stone-300" : "text-stone-500"
-              } px-10 py-2`}
+            className={`cursor-pointer rounded-full z-50 ${
+              option === "login" ? "text-stone-300" : "text-stone-500"
+            } px-10 py-2`}
           >
             Login
           </p>
           <p
-            className={`cursor-pointer rounded-full px-5 py-2 z-50 ${option === "signup" ? "text-stone-300" : "text-stone-500"
-              }`}
+            className={`cursor-pointer rounded-full px-5 py-2 z-50 ${
+              option === "signup" ? "text-stone-300" : "text-stone-500"
+            }`}
             onClick={() => {
               toggleOption("signup");
             }}
@@ -203,7 +209,7 @@ function LoginSignup() {
                 signUp(
                   userRef.current.value,
                   passwordRef.current.value,
-                  emailRef.current.value,
+                  emailRef.current.value
                 );
               }
             }
