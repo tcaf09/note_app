@@ -13,6 +13,10 @@ app.use("/api/users", users);
 app.use("/api/notes", notes);
 app.use("/api/folders", folders);
 
+app.get("/keepalive",(req, res) => {
+  res.send("Alive")
+})
+
 app.listen(PORT, () => {
   console.log(`Server is listening on port:${PORT}`);
 });
