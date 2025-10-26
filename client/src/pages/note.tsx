@@ -56,7 +56,7 @@ function Note() {
               Authorization: "Bearer " + authToken,
               "Content-Type": "application/json",
             },
-          },
+          }
         );
         if (!res.ok) throw new Error("Error loading note");
 
@@ -87,14 +87,16 @@ function Note() {
         setColours={setColours}
       />
       <div
-        className="absolute top-4 left-4 p-3 text-stone-300 text-2xl bg-stone-950 rounded-lg cursor-pointer z-50 inset-shadow-xs inset-shadow-stone-700 shadow-sm shadow-stone-950"
+        className="absolute top-4 left-4 p-3 text-stone-300 text-2xl bg-stone-800 rounded-lg cursor-pointer z-50 inset-shadow-xs inset-shadow-stone-700 shadow-sm shadow-stone-950"
         onClick={() => navigate("/dashboard")}
       >
         <FaHome />
       </div>
-      <div className="absolute top-4 right-4 p-3 px-6 text-stone-300 text-lg bg-stone-950 inset-shadow-sm inset-shadow-stone-700 rounded-lg shadow-sm shadow-stone-950 flex z-50">
+      <div className="absolute top-4 right-4 p-3 px-6 text-stone-300 text-lg bg-stone-800 inset-shadow-sm inset-shadow-stone-700 rounded-lg shadow-sm shadow-stone-950 flex z-50">
         <div
-          className={`text-3xl mr-2 ${saved ? "text-transparent" : "text-stone-300"}`}
+          className={`text-3xl mr-2 ${
+            saved ? "text-transparent" : "text-stone-300"
+          }`}
         >
           •
         </div>

@@ -31,7 +31,7 @@ function NoteCard({
 
   return (
     <div
-      className="bg-stone-950 w-52 rounded-xl shadow-sm shadow-stone-950 curosr-pointer"
+      className="bg-stone-950 w-52 rounded-xl shadow-sm shadow-stone-950 cursor-pointer"
       onClick={() => navigate(`/note/${note._id}`)}
     >
       <div
@@ -42,7 +42,7 @@ function NoteCard({
         }}
       ></div>
 
-      <div className="bg-stone-900 p-2 rounded-b-xl flex justify-between">
+      <div className="bg-stone-800 p-2 rounded-b-xl flex justify-between">
         <div>
           <p className="text-stone-300 text-xl break-all line-clamp-2 whitespace-normal">
             {note.name}

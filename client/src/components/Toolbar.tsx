@@ -31,40 +31,44 @@ function Toolbar({
   const [newColour, setNewColour] = useState<string>("#ffffff");
 
   return (
-    <div className=" absolute top-4 left-1/2 -translate-x-1/2 z-50 w-auto rounded-lg p-3 bg-stone-950 inset-shadow-sm inset-shadow-stone-700 flex shadow-sm shadow-stone-950">
+    <div className=" absolute top-4 left-1/2 -translate-x-1/2 z-50 w-auto rounded-lg p-3 bg-stone-800 inset-shadow-sm inset-shadow-stone-700 flex shadow-sm shadow-stone-950">
       <div
-        className={`mx-2 ${selected === "mouse"
+        className={`mx-2 ${
+          selected === "mouse"
             ? "border-stone-300 bg-stone-300/20"
             : "border-transparent"
-          } border w-fit p-2 rounded-md text-stone-300`}
+        } border w-fit p-2 rounded-md text-stone-300`}
         onClick={() => setSelected("mouse")}
       >
         <FaMousePointer />
       </div>
       <div
-        className={`mx-2 ${selected === "text"
+        className={`mx-2 ${
+          selected === "text"
             ? "border-stone-300 bg-stone-300/20"
             : "border-transparent"
-          } border w-fit p-2 rounded-md  text-stone-300`}
+        } border w-fit p-2 rounded-md  text-stone-300`}
         onClick={() => setSelected("text")}
       >
         <FaICursor />
       </div>
       <div
-        className={`mx-2 ${selected === "pan"
+        className={`mx-2 ${
+          selected === "pan"
             ? "border-stone-300 bg-stone-300/20"
             : "border-transparent"
-          } border w-fit p-2 rounded-md  text-stone-300`}
+        } border w-fit p-2 rounded-md  text-stone-300`}
         onClick={() => setSelected("pan")}
       >
         <FaHandPaper />
       </div>
       <div className="border mx-3 border-stone-300 h-8"></div>
       <div
-        className={`mx-2 ${selected === "eraser"
+        className={`mx-2 ${
+          selected === "eraser"
             ? "border-stone-300 bg-stone-300/20"
             : "border-transparent"
-          } border w-fit p-2 rounded-md  text-stone-300`}
+        } border w-fit p-2 rounded-md  text-stone-300`}
         onClick={() => setSelected("eraser")}
       >
         <FaEraser />
@@ -85,16 +89,18 @@ function Toolbar({
         />
       ))}
       <div
-        className={`mx-2 relative inline-block ${selected === "add"
+        className={`mx-2 relative inline-block ${
+          selected === "add"
             ? "border-stone-300 bg-stone-300/20"
             : "border-transparent"
-          } border w-fit p-2 rounded-full  text-stone-300`}
+        } border w-fit p-2 rounded-full  text-stone-300`}
         onClick={() => setSelected("add")}
       >
         <FaPlus />
         <div
-          className={`${selected === "add" ? "absolute" : "hidden"
-            } left-1/2 -translate-x-1/2 top-[150%] bg-stone-950 p-2 rounded-lg flex flex-col`}
+          className={`${
+            selected === "add" ? "absolute" : "hidden"
+          } left-1/2 -translate-x-1/2 top-[150%] bg-stone-950 p-2 rounded-lg flex flex-col`}
         >
           <HexColorPicker color={newColour} onChange={setNewColour} />
           <button

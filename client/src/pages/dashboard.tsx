@@ -4,6 +4,8 @@ import NoteCard from "@/components/NoteCard";
 import SidePanel from "@/components/SidePanel";
 import { useCallback, useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { TbLogout } from "react-icons/tb";
 
 type User = {
   username: string;
@@ -101,6 +103,7 @@ function Dashboard() {
     getNotes();
     getUser();
   }, [authToken, getFolders, getNotes]);
+  const navigate = useNavigate();
 
   return (
     <div className="w-full h-full">
@@ -141,9 +144,18 @@ function Dashboard() {
       <h1 className="text-stone-300 mx-auto my-20 text-center text-6xl">
         Welcome, {user && user.username}
       </h1>
-      <div className="w-2/3 p-10 mx-auto rounded-3xl bg-stone-950 inset-shadow-sm inset-shadow-stone-700 relative shadow-sm shadow-stone-950">
+      <div
+        className="absolute top-4 right-4 p-3 text-stone-300 text-2xl bg-stone-800 rounded-lg cursor-pointer z-50 inset-shadow-xs inset-shadow-stone-700 shadow-sm shadow-stone-950"
+        onClick={() => {
+          localStorage.setItem("token", "");
+          navigate("/");
+        }}
+      >
+        <TbLogout />
+      </div>
+      <div className="w-2/3 p-10 mx-auto rounded-3xl bg-stone-900 inset-shadow-sm inset-shadow-stone-700 relative shadow-sm shadow-stone-950">
         <button
-          className="bg-stone-800 inset-shadow-sm inset-shadow-stone-700 shadow-sm shadow-stone-950 text-stone-300 p-3 rounded-md absolute right-4 top-4 cursor-pointer"
+          className="hover:scale-103 !transition-all !duration-300 !ease-in-out bg-stone-800 inset-shadow-sm inset-shadow-stone-700 shadow-sm shadow-stone-950 text-stone-300 p-3 rounded-md absolute right-4 top-4 cursor-pointer"
           onClick={() => {
             setParentFolder(null);
             setNewNoteMenuShown(true);

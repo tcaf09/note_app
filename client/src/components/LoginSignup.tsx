@@ -149,8 +149,8 @@ function LoginSignup() {
 
   return (
     <div className="flex items-center justify-center h-screen">
-      <div className="bg-gradient-to-b to-stone-950 from-stone-900 to-30% inset-shadow-sm inset-shadow-stone-700 shadow-sm shadow-stone-stone-950 w-auto h-2/3 rounded-[25px] flex flex-col items-center justify-between px-24 py-5">
-        <div className="flex h-12 rounded-full bg-stone-900 inset-shadow-xs inset-shadow-stone-700 shadow-xs shadow-stone-950 justify-between w-full p-1 relative">
+      <div className="bg-gradient-to-b to-stone-900 from-stone-800 to-30% inset-shadow-sm inset-shadow-stone-700 shadow-sm shadow-stone-stone-950 w-auto h-2/3 rounded-[25px] flex flex-col items-center justify-between px-24 py-5">
+        <div className="flex h-12 rounded-full bg-stone-900 inset-shadow-sm inset-shadow-stone-950 justify-between w-full p-1 relative">
           <div
             className={`absolute ${
               option === "login"

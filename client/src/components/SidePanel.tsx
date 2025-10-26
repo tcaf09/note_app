@@ -121,8 +121,9 @@ function Folder({
             className="z-50"
           >
             <FaPlus
-              className={`my-2 pointer-events-none ${hover || showNewMenu ? "text-stone-400" : "text-transparent"
-                }`}
+              className={`my-2 pointer-events-none ${
+                hover || showNewMenu ? "text-stone-400" : "text-transparent"
+              }`}
             />
           </div>
           {showNewMenu && (
@@ -142,8 +143,9 @@ function Folder({
         </div>
       </div>
       <div
-        className={`${open ? "h-auto overflow-visible" : "h-0 overflow-hidden"
-          }  ml-4`}
+        className={`${
+          open ? "h-auto overflow-visible" : "h-0 overflow-hidden"
+        }  ml-4`}
       >
         {notes.map((note, i) => {
           if (note.folderId === folder._id) {
@@ -209,8 +211,9 @@ function SidePanel({
 
   return (
     <div
-      className={`h-screen fixed ${toggled ? "left-0" : "-left-48"
-        } top-0 w-60 inset-shadow-sm inset-shadow-stone-700 bg-stone-950 rounded-r-3xl text-stone-300 shadow-sm shadow-stone-950`}
+      className={`h-screen fixed ${
+        toggled ? "left-0" : "-left-48"
+      } top-0 w-60 inset-shadow-sm inset-shadow-stone-700 bg-stone-900 rounded-r-3xl text-stone-300 shadow-sm shadow-stone-950`}
       style={{
         transition: "all 0.3s ease-in-out",
       }}
