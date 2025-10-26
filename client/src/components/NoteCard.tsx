@@ -35,7 +35,7 @@ function NoteCard({
       onClick={() => navigate(`/note/${note._id}`)}
     >
       <div
-        className="h-40 text-stone-300 flex items-center justify-center cursor-pointer object-cover rounded-t-xl inset-shadow-sm inset-shadow-stone-700"
+        className="h-40 text-stone-300 flex items-center justify-center cursor-pointer object-cover rounded-t-xl inset-shadow-xs inset-shadow-stone-700"
         style={{
           backgroundImage: `url(${note.thumbnailUrl})`,
           backgroundSize: "cover",
