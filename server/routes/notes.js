@@ -132,15 +132,15 @@ router.patch("/:id", authenticateToken, async (req, res) => {
         pullOp.$pull.paths = { $in: req.body.pathsToDelete };
       }
     }
-    if (pullOp.$pull) {
-      await collection.updateOne(query, pullOp);
-    }
 
     updateOperation.$set = {
       thumbnailUrl: imageUrl,
     };
 
     const result = await collection.updateOne(query, updateOperation);
+    if (pullOp.$pull) {
+      await collection.updateOne(query, pullOp);
+    }
     res.status(200).send(result);
   } catch (err) {
     console.log(err);
