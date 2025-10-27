@@ -21,7 +21,6 @@ type Box = {
 };
 
 type Path = {
-  path: string;
   colour: string;
   points: [number, number, number][];
 };
@@ -292,20 +291,12 @@ function InfiniteCanvas({
   }
 
   const handlePointerUp = () => {
-    const stroke = getStroke(points, options);
-    const completedPathData = getSvgPathFromStroke(stroke);
     setPaths((prev) => {
-      const newPaths = [
-        ...prev,
-        { path: completedPathData, colour: colour, points: points },
-      ];
+      const newPaths = [...prev, { colour: colour, points: points }];
       return newPaths;
     });
     setPathsToSave((prev) => {
-      const newPaths = [
-        ...prev,
-        { path: completedPathData, colour: colour, points: points },
-      ];
+      const newPaths = [...prev, { colour: colour, points: points }];
       return newPaths;
     });
     setPoints([]);
@@ -557,9 +548,11 @@ function InfiniteCanvas({
           }}
         >
           {drawing && <path d={pathData} fill={colour} />}
-          {paths.map((e, i) => (
-            <path d={e.path} key={i} fill={e.colour} />
-          ))}
+          {paths.map((e, i) => {
+            const stroke = getStroke(e.points, options);
+            const pathD = getSvgPathFromStroke(stroke);
+            return <path d={pathD} key={i} fill={e.colour} />;
+          })}
         </svg>
       </div>
     </div>
