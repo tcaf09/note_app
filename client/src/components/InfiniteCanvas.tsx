@@ -357,7 +357,7 @@ function InfiniteCanvas({
 
   const addTextbox = (e: React.MouseEvent) => {
     const posx = (e.clientX - 50) / scale;
-    const posy = (e.clientY - 50) / scale;
+    const posy = e.clientY / scale;
     const id = uuid();
     const newBox: Box = {
       id,
