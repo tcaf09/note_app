@@ -18,6 +18,7 @@ type TextboxProps = {
   handleContextMenu: (e: React.MouseEvent) => void;
   onChange: (id: string, content: JSONContent) => void;
   onResize: (id: string, update: Partial<Box>) => void;
+  panPos: { x: number; y: number };
 };
 
 function Textbox({
@@ -25,6 +26,7 @@ function Textbox({
   handleContextMenu,
   onChange,
   onResize,
+  panPos,
 }: TextboxProps) {
   const [box, setBox] = useState<Box>(props);
   const [selected, setSelected] = useState<boolean>(true);
@@ -41,15 +43,18 @@ function Textbox({
     window.addEventListener("pointerup", stopDrag);
 
     isDraging.current = true;
-    offset.current = [e.clientX - box.x, e.clientY - box.y];
+    offset.current = [
+      e.clientX - panPos.x - box.x,
+      e.clientY - panPos.y - box.y,
+    ];
   };
 
   const drag = (e: PointerEvent) => {
     if (!isDraging.current) return;
     setBox((prev) => ({
       ...prev,
-      x: e.clientX - offset.current[0],
-      y: e.clientY - offset.current[1],
+      x: e.clientX - panPos.x - offset.current[0],
+      y: e.clientY - panPos.y - offset.current[1],
     }));
   };
 
@@ -100,40 +105,40 @@ function Textbox({
 
       switch (resizeHandle.current) {
         case "bottom":
-          height = e.clientY - y;
+          height = e.clientY - panPos.y - y;
           break;
 
         case "right":
-          width = e.clientX - x;
+          width = e.clientX - panPos.x - x;
           break;
 
         case "left":
-          width = width + (x - e.clientX);
-          x = e.clientX;
+          width = width + (x - (e.clientX - panPos.x));
+          x = e.clientX - panPos.x;
           break;
 
         case "bottomRight":
-          width = e.clientX - x;
-          height = e.clientY - y;
+          width = e.clientX - panPos.x - x;
+          height = e.clientY - panPos.y - y;
           break;
 
         case "bottomLeft":
-          width = width + (x - e.clientX);
-          height = e.clientY - y;
-          x = e.clientX;
+          width = width + (x - (e.clientX - panPos.x));
+          height = e.clientY - panPos.y - y;
+          x = e.clientX - panPos.x;
           break;
 
         case "topRight":
-          height = (height as number) + (y - e.clientY);
-          width = e.clientX - x;
-          y = e.clientY;
+          height = (height as number) + (y - (e.clientY - panPos.y));
+          width = e.clientX - panPos.x - x;
+          y = e.clientY - panPos.y;
           break;
 
         case "topLeft":
-          width = width + (x - e.clientX);
-          height = (height as number) + (y - e.clientY);
-          y = e.clientY;
-          x = e.clientX;
+          width = width + (x - (e.clientX - panPos.x));
+          height = (height as number) + (y - (e.clientY - panPos.y));
+          y = e.clientY - panPos.y;
+          x = e.clientX - panPos.x;
           break;
       }
 
@@ -157,8 +162,9 @@ function Textbox({
 
   return (
     <div
-      className={`absolute border-2 border-t-8 ${selected ? "border-stone-700" : "border-transparent"
-        } hover:border-stone-700`}
+      className={`absolute border-2 border-t-8 ${
+        selected ? "border-stone-700" : "border-transparent"
+      } hover:border-stone-700`}
       style={{
         left: box.x,
         top: box.y,

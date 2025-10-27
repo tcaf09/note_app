@@ -66,7 +66,7 @@ function DeleteMenu({
   }
 
   return (
-    <div className="z-50 text-stone-300 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-stone-950 inset-shadow-xs inset-shadow-stone-700 shadow-sm shadow-stone-950 rounded-2xl p-4 flex flex-col items-center">
+    <div className="z-50 text-stone-300 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-b from-stone-800 to-stone-900 to-10% inset-shadow-xs inset-shadow-stone-700 shadow-sm shadow-stone-950 rounded-2xl p-4 flex flex-col items-center">
       <h2>Delete {toDelete.name}?</h2>
       <div className="w-full flex gap-4 my-2">
         <button

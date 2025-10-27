@@ -145,7 +145,7 @@ function Dashboard() {
         Welcome, {user && user.username}
       </h1>
       <div
-        className="absolute top-4 right-4 p-3 text-stone-300 text-2xl bg-stone-800 rounded-lg cursor-pointer z-50 inset-shadow-xs inset-shadow-stone-700 shadow-sm shadow-stone-950"
+        className="absolute hover:scale-103 !transition-all !duration-150 !ease-in-out top-4 right-4 p-3 text-stone-300 text-2xl bg-stone-800 rounded-lg cursor-pointer z-50 inset-shadow-sm inset-shadow-stone-700 shadow-sm shadow-stone-950"
         onClick={() => {
           localStorage.setItem("token", "");
           navigate("/");
@@ -153,9 +153,9 @@ function Dashboard() {
       >
         <TbLogout />
       </div>
-      <div className="w-2/3 p-10 mx-auto rounded-3xl bg-stone-900 inset-shadow-sm inset-shadow-stone-700 relative shadow-sm shadow-stone-950">
+      <div className="w-2/3 p-10 max-h-200 overflow-scroll mx-auto rounded-3xl bg-stone-900 inset-shadow-sm inset-shadow-stone-700 relative shadow-sm shadow-stone-950">
         <button
-          className="hover:scale-103 !transition-all !duration-300 !ease-in-out bg-stone-800 inset-shadow-sm inset-shadow-stone-700 shadow-sm shadow-stone-950 text-stone-300 p-3 rounded-md absolute right-4 top-4 cursor-pointer"
+          className="hover:scale-103 !transition-all !duration-150 !ease-in-out bg-stone-800 inset-shadow-sm inset-shadow-stone-700 shadow-sm shadow-stone-950 text-stone-300 p-3 rounded-md absolute right-4 top-4 cursor-pointer"
           onClick={() => {
             setParentFolder(null);
             setNewNoteMenuShown(true);

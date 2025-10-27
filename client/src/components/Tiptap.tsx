@@ -50,10 +50,11 @@ const Tiptap = ({
     ], // define your extension array
     editorProps: {
       attributes: {
-        class: `prose prose-invert text-white ${selected
+        class: `prose prose-invert text-stone-300 ${
+          selected
             ? "pointer-events-auto select-text"
             : "pointer-events-none select-none"
-          } break-words focus:outline-none`,
+        } break-words focus:outline-none`,
       },
     },
   });

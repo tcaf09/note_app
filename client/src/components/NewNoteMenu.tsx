@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { FaAngleUp, FaRegFolder } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 type Folder = {
   _id: string | null;
@@ -27,9 +28,10 @@ function NewNoteMenu({
   parentFolder: Folder | null;
 }) {
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(
-    parentFolder,
+    parentFolder
   );
   const nameRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   const root: Folder = {
     _id: null,
@@ -52,6 +54,8 @@ function NewNoteMenu({
       });
 
       if (!res.ok) throw new Error("Error adding note");
+      const data = await res.json();
+      return data.insertedId;
     } catch (err) {
       console.log(err);
     }
@@ -115,8 +119,9 @@ function NewNoteMenu({
         >
           {selectedFolder?.name || "Select Folder..."}
           <FaAngleUp
-            className={`${isOpen ? "rotate-180" : "rotate-0"
-              } !transition-all !duration-300 !ease-in-out my-1`}
+            className={`${
+              isOpen ? "rotate-180" : "rotate-0"
+            } !transition-all !duration-150 !ease-in-out my-1`}
           />
         </button>
         <div className="bg-stone-300 rounded-md text-black absolute top-full mt-2 w-52 max-h-40 overflow-y-auto">
@@ -134,7 +139,7 @@ function NewNoteMenu({
               {folders.map((folder) =>
                 folder.parentId === null ? (
                   <FolderComponent folder={folder} key={folder._id} />
-                ) : null,
+                ) : null
               )}
             </>
           )}
@@ -144,27 +149,33 @@ function NewNoteMenu({
   };
 
   return (
-    <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-stone-950 inset-shadow-xs inset-shadow-stone-700 shadow-sm shadow-stone-950 text-stone-300 z-50 p-10 rounded-2xl w-fit text-lg">
+    <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-b to-stone-900 from-stone-800 to-30% inset-shadow-xs inset-shadow-stone-700 shadow-sm shadow-stone-950 text-stone-300 z-50 p-10 rounded-2xl w-fit text-lg">
       {!parentFolder && (
-        <div className="flex h-12 rounded-full bg-stone-900 inset-shadow-xs inset-shadow-stone-700 shadow-xs shadow-stone-950 justify-between w-full p-1 relative">
+        <div className="flex h-12 rounded-full bg-stone-900 inset-shadow-sm inset-shadow-stone-950 shadow-xs shadow-stone-950 justify-between w-full p-1 relative">
           <div
-            className={`absolute ${type === "Folder" ? "translate-x-0 w-32" : "translate-x-[calc(100%+0.5rem)] w-28"} h-10 rounded-full bg-stone-800 text-stone-300 shadow-xs shadow-stone-950 inset-shadow-xs inset-shadow-stone-700 !transition-all !duration-300 !ease-in-out`}
+            className={`absolute ${
+              type === "Folder"
+                ? "translate-x-0 w-32"
+                : "translate-x-[calc(100%+2.5rem)] w-24"
+            } h-10 rounded-full bg-stone-800 text-stone-300 shadow-xs shadow-stone-950 inset-shadow-xs inset-shadow-stone-700 !transition-all !duration-150 !ease-in-out`}
           ></div>
           <p
             onClick={() => setType("Folder")}
-            className={`cursor-pointer rounded-full z-50 ${type === "Folder" ? "text-stone-300" : "text-stone-500"
-              } px-10 py-2`}
+            className={`cursor-pointer rounded-full z-50 ${
+              type === "Folder" ? "text-stone-300" : "text-stone-500"
+            } px-10 py-2`}
           >
             Folder
           </p>
           <p
-            className={`cursor-pointer rounded-full px-5 py-2 z-50 ${type === "Note" ? "text-stone-300" : "text-stone-500"
-              }`}
+            className={`cursor-pointer rounded-full px-5 py-2 z-50 ${
+              type === "Note" ? "text-stone-300" : "text-stone-500"
+            }`}
             onClick={() => {
               setType("Note");
             }}
           >
-            Signup
+            Note
           </p>
         </div>
       )}
@@ -192,16 +203,17 @@ function NewNoteMenu({
         <button
           onClick={async () => {
             if (type === "Note") {
-              await addNote();
+              const noteId = await addNote();
               await loadNotes();
               setShown(false);
+              navigate(`/note/${noteId}`);
             } else if (type === "Folder") {
               await addFolder();
               await loadFolders();
               setShown(false);
             }
           }}
-          className="bg-stone-800 rounded-full w-1/2 p-3 block mx-auto cursor-pointer inset-shadow-sm inset-shadow-stone-700 shadow-sm shadow-stone-950 !transition-all !duration-300 !ease-in-out hover:scale-103"
+          className="bg-stone-800 rounded-full w-1/2 p-3 block mx-auto cursor-pointer inset-shadow-sm inset-shadow-stone-700 shadow-sm shadow-stone-950 !transition-all !duration-150 !ease-in-out hover:scale-103"
         >
           Create
         </button>

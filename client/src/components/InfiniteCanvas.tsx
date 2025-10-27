@@ -65,7 +65,7 @@ function InfiniteCanvas({
   const contextRef = useRef<HTMLDivElement>(null);
   const [contextPos, setContextPos] = useState<Pos | null>(null);
   const [contextTargetIndex, setContextTargetIndex] = useState<string | null>(
-    null,
+    null
   );
 
   const isPanning = useRef<boolean>(false);
@@ -90,7 +90,7 @@ function InfiniteCanvas({
       pathsToSave: Path[],
       boxesToSave: Box[],
       boxesToDelete: Box[],
-      pathsToDelete: Path[],
+      pathsToDelete: Path[]
     ) => {
       try {
         saving.current = true;
@@ -117,24 +117,27 @@ function InfiniteCanvas({
               boxesToDelete,
               thumbnailUrl,
             }),
-          },
+          }
         );
 
         if (!res.ok) throw new Error("Error saving note");
-        setPathsToSave([]);
-        setBoxesToSave([]);
-        setBoxesToDelete([]);
-        setPathsToDelete([]);
+        setPathsToSave((prev) => prev.filter((p) => !pathsToSave.includes(p)));
+        setBoxesToSave((prev) => prev.filter((b) => !boxesToSave.includes(b)));
+        setBoxesToDelete((prev) =>
+          prev.filter((b) => !boxesToSave.includes(b))
+        );
+        setPathsToDelete((prev) =>
+          prev.filter((p) => !pathsToDelete.includes(p))
+        );
 
         setTimeout(() => setSaved(true), 0);
       } catch (err) {
         console.log(err);
-        saving.current = false;
       } finally {
         saving.current = false;
       }
     },
-    [id, authToken, setSaved],
+    [id, authToken, setSaved]
   );
 
   function resetGestures(e?: React.PointerEvent) {
@@ -168,7 +171,7 @@ function InfiniteCanvas({
       const [p1, p2] = Object.values(activePointers.current.pointers);
       const initialDistance = Math.hypot(
         p2.clientX - p1.clientX,
-        p2.clientY - p1.clientY,
+        p2.clientY - p1.clientY
       );
       activePointers.current.initialDistance = initialDistance;
       activePointers.current.initialScale = scale;
@@ -196,7 +199,7 @@ function InfiniteCanvas({
       const clampedX = Math.min(0, Math.max(newX, viewportWidth - canvasWidth));
       const clampedY = Math.min(
         0,
-        Math.max(newY, viewportHeight - canvasHeight),
+        Math.max(newY, viewportHeight - canvasHeight)
       );
 
       setPos({ x: clampedX, y: clampedY });
@@ -204,7 +207,7 @@ function InfiniteCanvas({
       const [p1, p2] = Object.values(activePointers.current.pointers);
       const currentDistance = Math.hypot(
         p2.clientX - p1.clientX,
-        p2.clientY - p1.clientY,
+        p2.clientY - p1.clientY
       );
       const scaleFactor =
         currentDistance / (activePointers.current.initialDistance || 1);
@@ -214,10 +217,10 @@ function InfiniteCanvas({
         Math.min(
           Math.max(
             (activePointers.current.initialScale || 1) * dampedScaleFactor,
-            0.3,
+            0.3
           ),
-          3,
-        ),
+          3
+        )
       );
     }
   };
@@ -248,7 +251,7 @@ function InfiniteCanvas({
         acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
         return acc;
       },
-      ["M", ...stroke[0], "Q"],
+      ["M", ...stroke[0], "Q"]
     );
 
     d.push("Z");
@@ -382,13 +385,13 @@ function InfiniteCanvas({
   function updateBoxContent(id: string, content: JSONContent) {
     if (isLoading.current) return;
     setTextboxes((prev) =>
-      prev.map((box) => (box.id === id ? { ...box, content: content } : box)),
+      prev.map((box) => (box.id === id ? { ...box, content: content } : box))
     );
     setBoxesToSave((prev) => {
       const exists = prev.find((b) => b.id === id);
       if (exists) {
         return prev.map((box) =>
-          box.id === id ? { ...box, content: content } : box,
+          box.id === id ? { ...box, content: content } : box
         );
       } else {
         const fullBox = textboxes.find((b) => b.id === id);
@@ -433,7 +436,7 @@ function InfiniteCanvas({
       if (!saving.current) {
         saveNote(pathsToSave, boxesToSave, boxesToDelete, pathsToDelete);
       }
-    }, 5000);
+    }, 2500);
 
     return () => clearTimeout(timeout);
   }, [
@@ -451,8 +454,9 @@ function InfiniteCanvas({
 
   return (
     <div
-      className={`${selectedOption === "text" ? "cursor-text" : ""
-        } w-screen h-screen overflow-hidden`}
+      className={`${
+        selectedOption === "text" ? "cursor-text" : ""
+      } w-screen h-screen overflow-hidden`}
       ref={screenRef}
     >
       <div
@@ -485,14 +489,14 @@ function InfiniteCanvas({
               if (isLoading.current) return;
               setTextboxes((prev) =>
                 prev.map((box) =>
-                  box.id === id ? { ...box, ...updates } : box,
-                ),
+                  box.id === id ? { ...box, ...updates } : box
+                )
               );
               setBoxesToSave((prev) => {
                 const exists = prev.find((box) => box.id === id);
                 if (exists) {
                   return prev.map((box) =>
-                    box.id === id ? { ...box, ...updates } : box,
+                    box.id === id ? { ...box, ...updates } : box
                   );
                 } else {
                   const existingBox = textboxes.find((box) => box.id === id);
@@ -504,6 +508,7 @@ function InfiniteCanvas({
                 }
               });
             }}
+            panPos={pos}
           />
         ))}
         {contextPos && (

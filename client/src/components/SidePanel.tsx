@@ -137,7 +137,7 @@ function Folder({
             className="my-2"
             style={{
               transform: open ? "rotate(180deg)" : "rotate(0deg)",
-              transition: "all 0.3s ease-in-out",
+              transition: "all 0.15s ease-in-out",
             }}
           />
         </div>

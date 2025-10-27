@@ -156,7 +156,8 @@ function LoginSignup() {
               option === "login"
                 ? "translate-x-0 w-28"
                 : "translate-x-[calc(100%+1.4rem)] w-24"
-            } h-10 rounded-full bg-stone-800 text-stone-300 shadow-xs shadow-stone-950 inset-shadow-xs inset-shadow-stone-700 !transition-all !duration-300 !ease-in-out`}
+            } h-10 rounded-full bg-stone-800 text-stone-300 shadow-xs shadow-stone-950 inset-shadow-xs inset-shadow-stone-700 !transition-all !duration-150
+             !ease-in-out`}
           ></div>
           <p
             onClick={() => toggleOption("login")}
@@ -188,7 +189,7 @@ function LoginSignup() {
           {option === "login" ? loginForm : signupForm}
         </div>
         <button
-          className="text-stone-300 border-none bg-stone-800  hover:scale-103 inset-shadow-sm inset-shadow-stone-700 shadow-sm shadow-stone-950 w-3/4 rounded-full py-2 my-5 cursor-pointer !transition-all !duration-300 !ease-in-out"
+          className="text-stone-300 border-none bg-stone-800  hover:scale-103 inset-shadow-sm inset-shadow-stone-700 shadow-sm shadow-stone-950 w-3/4 rounded-full py-2 my-5 cursor-pointer !transition-all !duration-150 !ease-in-out"
           onClick={() => {
             if (option === "login" && userRef.current && passwordRef.current) {
               login(userRef.current.value, passwordRef.current.value);

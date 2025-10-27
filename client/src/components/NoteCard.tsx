@@ -31,7 +31,7 @@ function NoteCard({
 
   return (
     <div
-      className="bg-stone-950 w-52 rounded-xl shadow-sm shadow-stone-950 cursor-pointer"
+      className="bg-stone-950 w-52 rounded-xl shadow-sm shadow-stone-950 cursor-pointer hover:scale-103 !transition-all !duration-150 !ease-in-out"
       onClick={() => navigate(`/note/${note._id}`)}
     >
       <div
