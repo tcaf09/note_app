@@ -18,7 +18,6 @@ type Box = {
 };
 
 type Path = {
-  path: string;
   colour: string;
   points: [number, number, number][];
 };
