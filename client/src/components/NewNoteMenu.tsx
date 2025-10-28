@@ -154,21 +154,22 @@ function NewNoteMenu({
         <div className="flex h-12 rounded-full bg-stone-900 inset-shadow-sm inset-shadow-stone-950 shadow-xs shadow-stone-950 justify-between w-full p-1 relative">
           <div
             className={`absolute ${
-              type === "Folder"
-                ? "translate-x-0 w-32"
-                : "translate-x-[calc(100%+2.5rem)] w-24"
+              type === "Folder" ? "left-1" : "left-[calc(50%+0.125rem)]"
             } h-10 rounded-full bg-stone-800 text-stone-300 shadow-xs shadow-stone-950 inset-shadow-xs inset-shadow-stone-700 !transition-all !duration-150 !ease-in-out`}
+            style={{
+              width: "calc(50% - 0.25rem)",
+            }}
           ></div>
           <p
             onClick={() => setType("Folder")}
-            className={`cursor-pointer rounded-full z-50 ${
+            className={`cursor-pointer rounded-full z-50 flex-1 text-center ${
               type === "Folder" ? "text-stone-300" : "text-stone-500"
-            } px-10 py-2`}
+            } py-2`}
           >
             Folder
           </p>
           <p
-            className={`cursor-pointer rounded-full px-5 py-2 z-50 ${
+            className={`cursor-pointer rounded-full flex-1 text-center py-2 z-50 ${
               type === "Note" ? "text-stone-300" : "text-stone-500"
             }`}
             onClick={() => {

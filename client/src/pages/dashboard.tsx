@@ -153,7 +153,7 @@ function Dashboard() {
       >
         <TbLogout />
       </div>
-      <div className="w-2/3 p-10 max-h-200 overflow-scroll mx-auto rounded-3xl bg-stone-900 inset-shadow-sm inset-shadow-stone-700 relative shadow-sm shadow-stone-950">
+      <div className="w-2/3 p-10 max-h-200 overflow-scroll [scrollbar-width:none] mx-auto rounded-3xl bg-stone-900 inset-shadow-sm inset-shadow-stone-700 relative shadow-sm shadow-stone-950">
         <button
           className="hover:scale-103 !transition-all !duration-150 !ease-in-out bg-stone-800 inset-shadow-sm inset-shadow-stone-700 shadow-sm shadow-stone-950 text-stone-300 p-3 rounded-md absolute right-4 top-4 cursor-pointer"
           onClick={() => {

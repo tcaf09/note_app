@@ -20,6 +20,7 @@ type Box = {
 type Path = {
   colour: string;
   points: [number, number, number][];
+  size: number;
 };
 
 function Note() {
@@ -44,6 +45,7 @@ function Note() {
 
   const [noteName, setNoteName] = useState<string | null>(null);
   const [saved, setSaved] = useState<boolean>(true);
+
   useEffect(() => {
     async function loadNote() {
       try {
@@ -86,7 +88,7 @@ function Note() {
         setColours={setColours}
       />
       <div
-        className="absolute hover:scale-103 !transition-all !duration-150 !ease-in-out top-4 left-4 p-3 text-stone-300 text-2xl bg-stone-800 rounded-lg cursor-pointer z-50 inset-shadow-xs inset-shadow-stone-700 shadow-sm shadow-stone-950"
+        className="absolute hover:scale-103 !transition-all !duration-150 !ease-in-out top-4 left-4 p-4 text-stone-300 text-2xl bg-stone-800 rounded-lg cursor-pointer z-50 inset-shadow-xs inset-shadow-stone-700 shadow-sm shadow-stone-950"
         onClick={() => navigate("/dashboard")}
       >
         <FaHome />

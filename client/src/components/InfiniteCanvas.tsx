@@ -1,4 +1,10 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+} from "react";
 import Textbox from "./Textbox";
 import ContextMenu from "./ContextMenu";
 import { getStroke } from "perfect-freehand";
@@ -23,6 +29,7 @@ type Box = {
 type Path = {
   colour: string;
   points: [number, number, number][];
+  size: number;
 };
 
 type Props = {
@@ -40,6 +47,25 @@ type Props = {
   isLoading: React.RefObject<boolean>;
   setSaved: React.Dispatch<React.SetStateAction<boolean>>;
 };
+
+// function isPathVisible(
+//   path: Path,
+//   boundingBox: { minX: number; minY: number; maxX: number; maxY: number }
+// ) {
+//   const padding = path.size * 2;
+//   for (const [x, y] of path.points) {
+//     if (
+//       x >= boundingBox.minX - padding &&
+//       x <= boundingBox.maxX + padding &&
+//       y >= boundingBox.minY - padding &&
+//       y <= boundingBox.maxY + padding
+//     ) {
+//       return true;
+//     }
+//   }
+
+//   return false;
+// }
 
 function InfiniteCanvas({
   selectedOption,
@@ -291,12 +317,19 @@ function InfiniteCanvas({
   }
 
   const handlePointerUp = () => {
+    const size = penSizes[colours.indexOf(colour)] * 2;
     setPaths((prev) => {
-      const newPaths = [...prev, { colour: colour, points: points }];
+      const newPaths = [
+        ...prev,
+        { colour: colour, points: points, size: size },
+      ];
       return newPaths;
     });
     setPathsToSave((prev) => {
-      const newPaths = [...prev, { colour: colour, points: points }];
+      const newPaths = [
+        ...prev,
+        { colour: colour, points: points, size: size },
+      ];
       return newPaths;
     });
     setPoints([]);
@@ -392,6 +425,41 @@ function InfiniteCanvas({
       }
     });
   }
+
+  // const visiblePaths = useMemo(() => {
+  //   const viewportBounds = {
+  //     minX: -pos.x / scale,
+  //     maxX: (-pos.x + window.innerWidth) / scale,
+  //     minY: -pos.y / scale,
+  //     maxY: (-pos.y + window.innerHeight) / scale,
+  //   };
+
+  //   return paths.filter((path) => isPathVisible(path, viewportBounds));
+  // }, [paths, pos.x, pos.y, scale]);
+
+  const renderedPaths = useMemo(() => {
+    return paths.map((e) => {
+      const options = {
+        size: e.size,
+        smoothing: e.size / 32,
+        thinning: 0.11,
+        streamline: 0.01,
+        easing: (t: number) => t,
+        start: {
+          taper: 0,
+          cap: true,
+        },
+        end: {
+          taper: 0,
+          cap: true,
+        },
+      };
+      const stroke = getStroke(e.points, options);
+      const pathD = getSvgPathFromStroke(stroke);
+
+      return { pathD, colour: e.colour };
+    });
+  }, [paths]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -548,10 +616,8 @@ function InfiniteCanvas({
           }}
         >
           {drawing && <path d={pathData} fill={colour} />}
-          {paths.map((e, i) => {
-            const stroke = getStroke(e.points, options);
-            const pathD = getSvgPathFromStroke(stroke);
-            return <path d={pathD} key={i} fill={e.colour} />;
+          {renderedPaths.map((e, i) => {
+            return <path d={e.pathD} key={i} fill={e.colour} />;
           })}
         </svg>
       </div>
