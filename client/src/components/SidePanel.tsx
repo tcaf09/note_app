@@ -211,7 +211,7 @@ function SidePanel({
 
   return (
     <div
-      className={`h-screen fixed ${
+      className={`h-screen fixed overflow-scroll ${
         toggled ? "left-0" : "-left-48"
       } top-0 w-60 inset-shadow-sm inset-shadow-stone-700 bg-stone-900 rounded-r-3xl text-stone-300 shadow-sm shadow-stone-950`}
       style={{
