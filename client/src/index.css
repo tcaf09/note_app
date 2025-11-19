@@ -5,6 +5,7 @@
 @layer base {
   body {
     @apply bg-stone-950;
+    overflow-x: hidden
   }
   h1 {
     @apply text-4xl font-bold mt-4 mb-2;
@@ -25,4 +26,8 @@ ul {
 ol {
   list-style-type: decimal;
   margin-left: 1.5rem;
+}
+
+div::-webkit-scrollbar {
+  display: none;
 }
