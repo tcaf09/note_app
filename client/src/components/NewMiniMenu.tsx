@@ -28,7 +28,7 @@ function NewMiniMenu({
   return (
     <div
       ref={menuRef}
-      className="absolute top-full left-0 w-max bg-stone-950 inset-shadow-sm inset-shadow-stone-700 z-50 rounded-xl"
+      className="absolute top-full left-0 w-max bg-stone-950 inset-shadow-sm inset-shadow-stone-700 z-50 rounded-xl text-stone-300"
     >
       <div
         className="p-2 px-4 rounded-t-xl hover:bg-stone-900 !transition-all !duration-150 !ease-in-out"

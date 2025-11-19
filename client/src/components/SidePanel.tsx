@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FaAngleUp,
   FaRegUser,
@@ -10,6 +10,7 @@ import {
 import { MdMenu } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import NewMiniMenu from "./NewMiniMenu";
+import { createPortal } from "react-dom";
 
 type Note = {
   _id: string;
@@ -86,6 +87,18 @@ function Folder({
   const [open, setOpen] = useState<boolean>(false);
   const [hover, setHover] = useState<boolean>(false);
   const [showNewMenu, setShowNewMenu] = useState<boolean>(false);
+  const buttonRef = useRef<HTMLDivElement>(null);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number }>({
+    top: 0,
+    left: 0,
+  });
+
+  useEffect(() => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setMenuPos({ top: rect.bottom, left: rect.left });
+    }
+  }, [showNewMenu]);
 
   return (
     <>
@@ -113,6 +126,7 @@ function Folder({
         </div>
         <div className="flex relative gap-2">
           <div
+            ref={buttonRef}
             onClick={(e) => {
               e.stopPropagation();
               setParentFolder(folder);
@@ -126,13 +140,23 @@ function Folder({
               }`}
             />
           </div>
-          {showNewMenu && (
-            <NewMiniMenu
-              setShowNewMenu={setShowNewMenu}
-              setNewNoteMenuShown={setNewNoteMenuShown}
-              setMenuType={setMenuType}
-            />
-          )}
+          {showNewMenu &&
+            createPortal(
+              <div
+                style={{
+                  position: "fixed",
+                  top: menuPos.top,
+                  left: menuPos.left,
+                }}
+              >
+                <NewMiniMenu
+                  setShowNewMenu={setShowNewMenu}
+                  setNewNoteMenuShown={setNewNoteMenuShown}
+                  setMenuType={setMenuType}
+                />
+              </div>,
+              document.body
+            )}
           <FaAngleUp
             className="my-2"
             style={{

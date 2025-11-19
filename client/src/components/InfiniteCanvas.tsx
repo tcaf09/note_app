@@ -218,8 +218,8 @@ function InfiniteCanvas({
 
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
-      const canvasWidth = 5000;
-      const canvasHeight = 5000;
+      const canvasWidth = 5000 * scale;
+      const canvasHeight = 5000 * scale;
 
       const clampedX = Math.min(0, Math.max(newX, viewportWidth - canvasWidth));
       const clampedY = Math.min(
